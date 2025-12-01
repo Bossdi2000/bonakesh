@@ -1,0 +1,512 @@
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import DashboardLayout from "./dashboard-layout"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Plus, Trash2, Edit2 } from "lucide-react"
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog"
+import snackbar from "@/lib/ui/snackbar"
+
+export default function ProductsContent({ admin, products, user }: any) {
+  const [open, setOpen] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [restockOpen, setRestockOpen] = useState(false)
+  const [restockProduct, setRestockProduct] = useState<any | null>(null)
+  const [restockQty, setRestockQty] = useState<string>("")
+  const [restockError, setRestockError] = useState<string>("")
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [formData, setFormData] = useState({
+    name: "",
+    sku: "",
+    buying_price: "",
+    selling_price: "",
+    quantity: "",
+  })
+  const [searchTerm, setSearchTerm] = useState("")
+  const router = useRouter()
+
+  const handleOpenDialog = (product?: any) => {
+    if (product) {
+      setEditingId(product.id)
+      setFormData({
+        name: product.name,
+        sku: product.sku || "",
+        buying_price: product.buying_price,
+        selling_price: product.selling_price,
+        quantity: product.quantity,
+      })
+    } else {
+      setEditingId(null)
+      setFormData({ name: "", sku: "", buying_price: "", selling_price: "", quantity: "" })
+    }
+    setOpen(true)
+  }
+
+  const handleOpenRestock = (product: any) => {
+    setRestockProduct(product)
+    setRestockQty("")
+    setRestockError("")
+    setRestockOpen(true)
+  }
+
+  const handleConfirmRestock = async () => {
+    if (!restockProduct) return
+    const addQty = Number.parseInt(restockQty || "0")
+    if (!addQty || addQty <= 0) {
+      snackbar.error("Enter a valid quantity to add")
+      return
+    }
+    setIsLoading(true)
+    try {
+      const res = await fetch(`/api/products/${restockProduct.id}/restock`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ addQty }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data?.error || `Restock failed (${res.status})`)
+      snackbar.success("Stock increased")
+      setRestockOpen(false)
+      setRestockProduct(null)
+      setRestockQty("")
+      setRestockError("")
+      router.refresh()
+    } catch (e) {
+      console.error(e)
+      const msg = typeof e === "object" && e && "message" in (e as any) ? (e as any).message : "Failed to restock"
+      snackbar.error(msg)
+      setRestockError(msg)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleSaveProduct = async () => {
+    if (!formData.name || !formData.buying_price || !formData.selling_price || !formData.quantity) {
+      snackbar.error("Please fill all product fields")
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const payload = {
+        name: formData.name,
+        sku: String((formData as any).sku || "").trim(),
+        buying_price: Number.parseFloat(formData.buying_price),
+        selling_price: Number.parseFloat(formData.selling_price),
+        quantity: Number.parseInt(formData.quantity),
+      }
+      let res: Response
+      if (editingId) {
+        res = await fetch(`/api/products/${editingId}/update`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          throw new Error(err?.error || `Update failed (${res.status})`)
+        }
+        snackbar.success("Product updated successfully")
+      } else {
+        res = await fetch(`/api/products/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          throw new Error(err?.error || `Create failed (${res.status})`)
+        }
+        snackbar.success("Product added successfully")
+      }
+
+      setOpen(false)
+      setFormData({ name: "", sku: "", buying_price: "", selling_price: "", quantity: "" })
+      router.refresh()
+    } catch (error) {
+      console.error("Error saving product:", error)
+      const msg =
+        typeof error === "object" && error && "message" in (error as any)
+          ? (error as any).message
+          : "Failed to save product"
+      snackbar.error(msg)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleDeleteProduct = async (id: string) => {
+    setIsLoading(true)
+    try {
+      const res = await fetch(`/api/products/${id}/delete`, { method: "POST" })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err?.error || `Delete failed (${res.status})`)
+      }
+      router.refresh()
+      snackbar.success("Product deleted")
+    } catch (error) {
+      console.error("Error deleting product:", error)
+      const msg =
+        typeof error === "object" && error && "message" in (error as any)
+          ? (error as any).message
+          : "Failed to delete product"
+      snackbar.error(msg)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const filteredProducts = products.filter((p: any) => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+
+  const totalBoughtValue = products.reduce((acc: number, p: any) => acc + p.buying_price * p.quantity, 0)
+  const totalSellingValue = products.reduce((acc: number, p: any) => acc + p.selling_price * p.quantity, 0)
+  const expectedProfit = totalSellingValue - totalBoughtValue
+
+  return (
+    <DashboardLayout admin={admin} user={user}>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Stock Management</h1>
+            <p className="text-slate-400 mt-1">Manage products and inventory</p>
+          </div>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => handleOpenDialog()} className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Add New Stock
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-slate-800 border-slate-700">
+              <DialogHeader>
+                <DialogTitle className="text-white">{editingId ? "Edit Product" : "Add New Product"}</DialogTitle>
+                <DialogDescription className="text-slate-400">
+                  {editingId ? "Update product details" : "Create a new product"}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-slate-300">Product Name</Label>
+                  <Input
+                    placeholder="e.g., Refrigerator XL"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="bg-slate-700 border-slate-600 text-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-slate-300">SKU</Label>
+                  <Input
+                    placeholder="e.g., RF-XL-001"
+                    value={(formData as any).sku || ""}
+                    onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                    className="bg-slate-700 border-slate-600 text-white"
+                  />
+                </div>
+                {/* Computed Previews */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-700/30 p-4 rounded-lg">
+                  <div>
+                    <p className="text-slate-400 text-sm">Total Bought Value</p>
+                    <p className="text-white text-lg font-semibold">
+                      ₦{(
+                        (Number.parseFloat(String(formData.buying_price)) || 0) *
+                        (Number.parseInt(String(formData.quantity)) || 0)
+                      ).toLocaleString("en-NG")}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-slate-400 text-sm">Total Selling Value</p>
+                    <p className="text-white text-lg font-semibold">
+                      ₦{(
+                        (Number.parseFloat(String(formData.selling_price)) || 0) *
+                        (Number.parseInt(String(formData.quantity)) || 0)
+                      ).toLocaleString("en-NG")}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-slate-400 text-sm">Expected Profit</p>
+                    <p className={`text-lg font-semibold ${((Number.parseFloat(String(formData.selling_price)) || 0) - (Number.parseFloat(String(formData.buying_price)) || 0)) >= 0 ? "text-green-500" : "text-red-500"}`}>
+                      ₦{(
+                        ((Number.parseFloat(String(formData.selling_price)) || 0) -
+                          (Number.parseFloat(String(formData.buying_price)) || 0)) *
+                        (Number.parseInt(String(formData.quantity)) || 0)
+                      ).toLocaleString("en-NG")}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-slate-300">Buying Price</Label>
+                    <Input
+                      type="number"
+                      placeholder="0.00"
+                      value={formData.buying_price}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          buying_price: e.target.value,
+                        })
+                      }
+                      className="bg-slate-700 border-slate-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-slate-300">Selling Price</Label>
+                    <Input
+                      type="number"
+                      placeholder="0.00"
+                      value={formData.selling_price}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          selling_price: e.target.value,
+                        })
+                      }
+                      className="bg-slate-700 border-slate-600 text-white"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-slate-300">Quantity</Label>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={formData.quantity}
+                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                    className="bg-slate-700 border-slate-600 text-white"
+                  />
+                </div>
+                <Button
+                  onClick={handleSaveProduct}
+                  disabled={isLoading}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
+                  {isLoading ? "Saving..." : editingId ? "Update Product" : "Add Product"}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Summary Cards */}
+        <div className="grid md:grid-cols-3 gap-4">
+          <Card className="border-slate-700 bg-slate-800/50">
+            <CardContent className="p-6">
+              <p className="text-slate-400 text-sm mb-1">Total Products</p>
+              <p className="text-3xl font-bold text-white">{products.length}</p>
+            </CardContent>
+          </Card>
+          <Card className="border-slate-700 bg-slate-800/50">
+            <CardContent className="p-6">
+              <p className="text-slate-400 text-sm mb-1">Total Bought Value</p>
+              <p className="text-3xl font-bold text-white">₦{totalBoughtValue.toLocaleString("en-NG")}</p>
+            </CardContent>
+          </Card>
+          <Card className="border-slate-700 bg-slate-800/50">
+            <CardContent className="p-6">
+              <p className="text-slate-400 text-sm mb-1">Expected Profit</p>
+              <p className={`text-3xl font-bold ${expectedProfit >= 0 ? "text-green-500" : "text-red-500"}`}>
+                ₦{expectedProfit.toLocaleString("en-NG")}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Search */}
+        <div>
+          <Input
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="bg-slate-700 border-slate-600 text-white"
+          />
+        </div>
+
+        {/* Products Table */}
+        <Card className="border-slate-700 bg-slate-800/50">
+          <CardHeader>
+            <CardTitle className="text-white">Products</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-700">
+                    <th className="text-left py-3 px-4 text-slate-400 font-medium">Name</th>
+                    <th className="text-right py-3 px-4 text-slate-400 font-medium">Buy Price</th>
+                    <th className="text-right py-3 px-4 text-slate-400 font-medium">Sell Price</th>
+                    <th className="text-right py-3 px-4 text-slate-400 font-medium">Qty</th>
+                    <th className="text-right py-3 px-4 text-slate-400 font-medium">Stock Value</th>
+                    <th className="text-right py-3 px-4 text-slate-400 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.length > 0 ? (
+                    filteredProducts.map((product: any) => (
+                      <tr
+                        key={product.id}
+                        className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors"
+                      >
+                        <td className="py-3 px-4 text-white">{product.name}</td>
+                        <td className="text-right py-3 px-4 text-slate-300">
+                          ₦{product.buying_price.toLocaleString("en-NG")}
+                        </td>
+                        <td className="text-right py-3 px-4 text-slate-300">
+                          ₦{product.selling_price.toLocaleString("en-NG")}
+                        </td>
+                        <td className="text-right py-3 px-4 text-slate-300">{product.quantity}</td>
+                        <td className="text-right py-3 px-4 text-green-500 font-semibold">
+                          ₦{(product.selling_price * product.quantity).toLocaleString("en-NG")}
+                        </td>
+                        <td className="text-right py-3 px-4">
+                          <div className="flex justify-end gap-2">
+                            {/* Restock */}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenRestock(product)}
+                              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                            >
+                              + Restock
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenDialog(product)}
+                              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setDeleteId(product.id)
+                                setDeleteOpen(true)
+                              }}
+                              disabled={isLoading}
+                              className="border-red-600 text-red-500 hover:bg-red-600/10"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-slate-400">
+                        No products found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      {/* Restock Modal */}
+      <RestockDialog
+        open={restockOpen}
+        onOpenChange={setRestockOpen}
+        qty={restockQty}
+        setQty={setRestockQty}
+        product={restockProduct}
+        onConfirm={handleConfirmRestock}
+        loading={isLoading}
+        error={restockError}
+      />
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent className="bg-slate-800 border-slate-700">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Delete Product</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-400">
+              This action cannot be undone. This will permanently remove the product.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteOpen(false)} className="border-slate-600">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (!deleteId) return
+                await handleDeleteProduct(deleteId)
+                setDeleteOpen(false)
+                setDeleteId(null)
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </DashboardLayout>
+  )
+}
+
+// Restock Modal
+export function RestockDialog({ open, onOpenChange, qty, setQty, product, onConfirm, loading, error }: any) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-slate-800 border-slate-700">
+        <DialogHeader>
+          <DialogTitle className="text-white">Restock Product</DialogTitle>
+          <DialogDescription className="text-slate-400">
+            Add quantity to <span className="font-medium text-white">{product?.name || "Selected Product"}</span>
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <Label className="text-slate-300">Quantity to Add</Label>
+            <Input
+              type="number"
+              min={1}
+              placeholder="0"
+              value={qty}
+              onChange={(e) => setQty(e.target.value)}
+              className="bg-slate-700 border-slate-600 text-white"
+            />
+          </div>
+          {error && (
+            <p className="text-red-500 text-sm">{error}</p>
+          )}
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" className="border-slate-600" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button onClick={onConfirm} disabled={loading} className="bg-blue-600 hover:bg-blue-700">
+              {loading ? "Restocking..." : "Confirm"}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
