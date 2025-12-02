@@ -1,34 +1,42 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type CartItem = { product_id: string; name: string; price_per_unit: number; quantity: number; total_price: number }
 
 export default function CheckoutLiveView({ adminId }: { adminId: string }) {
-  const supabase = createClient()
   const [cart, setCart] = useState<CartItem[]>([])
   const [total, setTotal] = useState(0)
   const [paymentMethod, setPaymentMethod] = useState("cash")
   const [adminName, setAdminName] = useState("")
   const [customer, setCustomer] = useState<{ name?: string; address?: string; phone?: string }>({})
+  const channelRef = useRef<any>(null)
 
   useEffect(() => {
     if (!adminId) return
-    const channel = supabase.channel(`checkout:${adminId}`)
-    channel.on("broadcast", { event: "cart:update" }, (payload: any) => {
-      const data = payload.payload || {}
-      setCart(data.cart || [])
-      setTotal(data.totalAmount || 0)
-      setPaymentMethod(data.paymentMethod || "cash")
-      setAdminName(data.admin?.name || "")
-      setCustomer(data.customer || {})
-    })
-    channel.subscribe()
+    let channel: any = null
+    try {
+      const supabase = createClient()
+      channel = supabase.channel(`checkout:${adminId}`)
+      channel.on("broadcast", { event: "cart:update" }, (payload: any) => {
+        const data = payload.payload || {}
+        setCart(data.cart || [])
+        setTotal(data.totalAmount || 0)
+        setPaymentMethod(data.paymentMethod || "cash")
+        setAdminName(data.admin?.name || "")
+        setCustomer(data.customer || {})
+      })
+      channel.subscribe()
+      channelRef.current = channel
+    } catch {
+      // ignore client creation errors during SSR/prerender
+    }
     return () => {
       try {
-        channel.unsubscribe()
+        channelRef.current?.unsubscribe()
       } catch {}
+      channelRef.current = null
     }
   }, [adminId])
 

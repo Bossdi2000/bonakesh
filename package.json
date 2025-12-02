@@ -4,7 +4,8 @@
   "private": true,
   "packageManager": "pnpm@10.0.0",
   "pnpm": {
-    "allowedBuildScripts": ["sharp"]
+    "allowedBuildScripts": ["sharp"],
+    "onlyBuiltDependencies": ["sharp", "esbuild", "@parcel/watcher"]
   },
   "scripts": {
     "build": "next build",

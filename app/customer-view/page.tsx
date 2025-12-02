@@ -1,4 +1,5 @@
 import CheckoutLiveView from "../../components/dashboard/checkout-live-view"
+export const dynamic = "force-dynamic"
 
 export default function CustomerViewPage({ searchParams }: { searchParams: { admin?: string } }) {
   const adminId = searchParams.admin || ""
