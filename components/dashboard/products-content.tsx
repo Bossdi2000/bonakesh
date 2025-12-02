@@ -192,47 +192,47 @@ export default function ProductsContent({ admin, products, user }: any) {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Stock Management</h1>
-            <p className="text-slate-400 mt-1">Manage products and inventory</p>
+            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Stock Management</h1>
+            <p className="text-neutral-600 dark:text-white/70 mt-1">Manage products and inventory</p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => handleOpenDialog()} className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={() => handleOpenDialog()} className="bg-[#7a1632] hover:bg-[#66122a] text-white">
                 <Plus className="w-4 h-4 mr-2" />
                 Add New Stock
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-slate-800 border-slate-700">
+            <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
               <DialogHeader>
-                <DialogTitle className="text-white">{editingId ? "Edit Product" : "Add New Product"}</DialogTitle>
-                <DialogDescription className="text-slate-400">
+                <DialogTitle className="text-neutral-900 dark:text-white">{editingId ? "Edit Product" : "Add New Product"}</DialogTitle>
+                <DialogDescription className="text-neutral-600 dark:text-white/70">
                   {editingId ? "Update product details" : "Create a new product"}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label className="text-slate-300">Product Name</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">Product Name</Label>
                   <Input
                     placeholder="e.g., Refrigerator XL"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="bg-slate-700 border-slate-600 text-white"
+                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                   />
                 </div>
                 <div>
-                  <Label className="text-slate-300">SKU</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">SKU</Label>
                   <Input
                     placeholder="e.g., RF-XL-001"
                     value={(formData as any).sku || ""}
                     onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                    className="bg-slate-700 border-slate-600 text-white"
+                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                   />
                 </div>
                 {/* Computed Previews */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-700/30 p-4 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#7a1632]/5 dark:bg-white/5 p-4 rounded-lg">
                   <div>
-                    <p className="text-slate-400 text-sm">Total Bought Value</p>
-                    <p className="text-white text-lg font-semibold">
+                    <p className="text-neutral-600 dark:text-white/70 text-sm">Total Bought Value</p>
+                    <p className="text-neutral-900 dark:text-white text-lg font-semibold">
                       ₦{(
                         (Number.parseFloat(String(formData.buying_price)) || 0) *
                         (Number.parseInt(String(formData.quantity)) || 0)
@@ -240,8 +240,8 @@ export default function ProductsContent({ admin, products, user }: any) {
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-400 text-sm">Total Selling Value</p>
-                    <p className="text-white text-lg font-semibold">
+                    <p className="text-neutral-600 dark:text-white/70 text-sm">Total Selling Value</p>
+                    <p className="text-neutral-900 dark:text-white text-lg font-semibold">
                       ₦{(
                         (Number.parseFloat(String(formData.selling_price)) || 0) *
                         (Number.parseInt(String(formData.quantity)) || 0)
@@ -249,7 +249,7 @@ export default function ProductsContent({ admin, products, user }: any) {
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-400 text-sm">Expected Profit</p>
+                    <p className="text-neutral-600 dark:text-white/70 text-sm">Expected Profit</p>
                     <p className={`text-lg font-semibold ${((Number.parseFloat(String(formData.selling_price)) || 0) - (Number.parseFloat(String(formData.buying_price)) || 0)) >= 0 ? "text-green-500" : "text-red-500"}`}>
                       ₦{(
                         ((Number.parseFloat(String(formData.selling_price)) || 0) -
@@ -261,7 +261,7 @@ export default function ProductsContent({ admin, products, user }: any) {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-slate-300">Buying Price</Label>
+                    <Label className="text-neutral-700 dark:text-white/80">Buying Price</Label>
                     <Input
                       type="number"
                       placeholder="0.00"
@@ -272,11 +272,11 @@ export default function ProductsContent({ admin, products, user }: any) {
                           buying_price: e.target.value,
                         })
                       }
-                      className="bg-slate-700 border-slate-600 text-white"
+                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                     />
                   </div>
                   <div>
-                    <Label className="text-slate-300">Selling Price</Label>
+                    <Label className="text-neutral-700 dark:text-white/80">Selling Price</Label>
                     <Input
                       type="number"
                       placeholder="0.00"
@@ -287,24 +287,24 @@ export default function ProductsContent({ admin, products, user }: any) {
                           selling_price: e.target.value,
                         })
                       }
-                      className="bg-slate-700 border-slate-600 text-white"
+                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-slate-300">Quantity</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">Quantity</Label>
                   <Input
                     type="number"
                     placeholder="0"
                     value={formData.quantity}
                     onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                    className="bg-slate-700 border-slate-600 text-white"
+                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                   />
                 </div>
                 <Button
                   onClick={handleSaveProduct}
                   disabled={isLoading}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white"
                 >
                   {isLoading ? "Saving..." : editingId ? "Update Product" : "Add Product"}
                 </Button>
@@ -315,21 +315,21 @@ export default function ProductsContent({ admin, products, user }: any) {
 
         {/* Summary Cards */}
         <div className="grid md:grid-cols-3 gap-4">
-          <Card className="border-slate-700 bg-slate-800/50">
+          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
             <CardContent className="p-6">
-              <p className="text-slate-400 text-sm mb-1">Total Products</p>
-              <p className="text-3xl font-bold text-white">{products.length}</p>
+              <p className="text-neutral-600 dark:text-white/70 text-sm mb-1">Total Products</p>
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white">{products.length}</p>
             </CardContent>
           </Card>
-          <Card className="border-slate-700 bg-slate-800/50">
+          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
             <CardContent className="p-6">
-              <p className="text-slate-400 text-sm mb-1">Total Bought Value</p>
-              <p className="text-3xl font-bold text-white">₦{totalBoughtValue.toLocaleString("en-NG")}</p>
+              <p className="text-neutral-600 dark:text-white/70 text-sm mb-1">Total Bought Value</p>
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white">₦{totalBoughtValue.toLocaleString("en-NG")}</p>
             </CardContent>
           </Card>
-          <Card className="border-slate-700 bg-slate-800/50">
+          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
             <CardContent className="p-6">
-              <p className="text-slate-400 text-sm mb-1">Expected Profit</p>
+              <p className="text-neutral-600 dark:text-white/70 text-sm mb-1">Expected Profit</p>
               <p className={`text-3xl font-bold ${expectedProfit >= 0 ? "text-green-500" : "text-red-500"}`}>
                 ₦{expectedProfit.toLocaleString("en-NG")}
               </p>
@@ -343,26 +343,26 @@ export default function ProductsContent({ admin, products, user }: any) {
             placeholder="Search products..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-slate-700 border-slate-600 text-white"
+            className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
           />
         </div>
 
         {/* Products Table */}
-        <Card className="border-slate-700 bg-slate-800/50">
+        <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
           <CardHeader>
-            <CardTitle className="text-white">Products</CardTitle>
+            <CardTitle className="text-neutral-900 dark:text-white">Products</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-700">
-                    <th className="text-left py-3 px-4 text-slate-400 font-medium">Name</th>
-                    <th className="text-right py-3 px-4 text-slate-400 font-medium">Buy Price</th>
-                    <th className="text-right py-3 px-4 text-slate-400 font-medium">Sell Price</th>
-                    <th className="text-right py-3 px-4 text-slate-400 font-medium">Qty</th>
-                    <th className="text-right py-3 px-4 text-slate-400 font-medium">Stock Value</th>
-                    <th className="text-right py-3 px-4 text-slate-400 font-medium">Actions</th>
+                  <tr className="border-b border-[#7a1632]/30">
+                    <th className="text-left py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Name</th>
+                    <th className="text-right py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Buy Price</th>
+                    <th className="text-right py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Sell Price</th>
+                    <th className="text-right py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Qty</th>
+                    <th className="text-right py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Stock Value</th>
+                    <th className="text-right py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -370,16 +370,16 @@ export default function ProductsContent({ admin, products, user }: any) {
                     filteredProducts.map((product: any) => (
                       <tr
                         key={product.id}
-                        className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors"
+                        className="border-b border-[#7a1632]/30 hover:bg-[#7a1632]/5 dark:hover:bg-white/5 transition-colors"
                       >
-                        <td className="py-3 px-4 text-white">{product.name}</td>
-                        <td className="text-right py-3 px-4 text-slate-300">
+                        <td className="py-3 px-4 text-neutral-900 dark:text-white">{product.name}</td>
+                        <td className="text-right py-3 px-4 text-neutral-700 dark:text-white/80">
                           ₦{product.buying_price.toLocaleString("en-NG")}
                         </td>
-                        <td className="text-right py-3 px-4 text-slate-300">
+                        <td className="text-right py-3 px-4 text-neutral-700 dark:text-white/80">
                           ₦{product.selling_price.toLocaleString("en-NG")}
                         </td>
-                        <td className="text-right py-3 px-4 text-slate-300">{product.quantity}</td>
+                        <td className="text-right py-3 px-4 text-neutral-700 dark:text-white/80">{product.quantity}</td>
                         <td className="text-right py-3 px-4 text-green-500 font-semibold">
                           ₦{(product.selling_price * product.quantity).toLocaleString("en-NG")}
                         </td>
@@ -390,7 +390,7 @@ export default function ProductsContent({ admin, products, user }: any) {
                               variant="outline"
                               size="sm"
                               onClick={() => handleOpenRestock(product)}
-                              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                              className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
                             >
                               + Restock
                             </Button>
@@ -398,7 +398,7 @@ export default function ProductsContent({ admin, products, user }: any) {
                               variant="outline"
                               size="sm"
                               onClick={() => handleOpenDialog(product)}
-                              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                              className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
                             >
                               <Edit2 className="w-4 h-4" />
                             </Button>
@@ -420,7 +420,7 @@ export default function ProductsContent({ admin, products, user }: any) {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="py-8 text-center text-slate-400">
+                      <td colSpan={6} className="py-8 text-center text-neutral-600 dark:text-white/70">
                         No products found
                       </td>
                     </tr>
@@ -444,15 +444,15 @@ export default function ProductsContent({ admin, products, user }: any) {
       />
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent className="bg-slate-800 border-slate-700">
+        <AlertDialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Delete Product</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogTitle className="text-neutral-900 dark:text-white">Delete Product</AlertDialogTitle>
+            <AlertDialogDescription className="text-neutral-600 dark:text-white/70">
               This action cannot be undone. This will permanently remove the product.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeleteOpen(false)} className="border-slate-600">Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setDeleteOpen(false)} className="border-[#7a1632]/30">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
                 if (!deleteId) return
@@ -475,33 +475,33 @@ export default function ProductsContent({ admin, products, user }: any) {
 export function RestockDialog({ open, onOpenChange, qty, setQty, product, onConfirm, loading, error }: any) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-slate-800 border-slate-700">
+      <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
         <DialogHeader>
-          <DialogTitle className="text-white">Restock Product</DialogTitle>
-          <DialogDescription className="text-slate-400">
-            Add quantity to <span className="font-medium text-white">{product?.name || "Selected Product"}</span>
+          <DialogTitle className="text-neutral-900 dark:text-white">Restock Product</DialogTitle>
+          <DialogDescription className="text-neutral-600 dark:text-white/70">
+            Add quantity to <span className="font-medium text-neutral-900 dark:text-white">{product?.name || "Selected Product"}</span>
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label className="text-slate-300">Quantity to Add</Label>
+            <Label className="text-neutral-700 dark:text-white/80">Quantity to Add</Label>
             <Input
               type="number"
               min={1}
               placeholder="0"
               value={qty}
               onChange={(e) => setQty(e.target.value)}
-              className="bg-slate-700 border-slate-600 text-white"
+              className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
             />
           </div>
           {error && (
             <p className="text-red-500 text-sm">{error}</p>
           )}
           <div className="flex gap-2 justify-end">
-            <Button variant="outline" className="border-slate-600" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" className="border-[#7a1632]/30" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button onClick={onConfirm} disabled={loading} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={onConfirm} disabled={loading} className="bg-[#7a1632] hover:bg-[#66122a] text-white">
               {loading ? "Restocking..." : "Confirm"}
             </Button>
           </div>

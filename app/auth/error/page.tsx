@@ -7,27 +7,27 @@ import { AlertCircle } from "lucide-react"
 
 export default function AuthErrorPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0f0b0c] p-4">
       <div className="w-full max-w-md">
-        <Card className="border-slate-700 bg-slate-800">
+        <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
+            <CardTitle className="text-neutral-900 dark:text-white flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-red-500" />
               Authentication Error
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-slate-300">
+            <p className="text-neutral-600 dark:text-white/70">
               There was an error with your authentication. Please try again or contact support.
             </p>
             <div className="flex gap-2">
               <Link href="/auth/login" className="flex-1">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">Back to Login</Button>
+                <Button className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white">Back to Login</Button>
               </Link>
               <Link href="/" className="flex-1">
                 <Button
                   variant="outline"
-                  className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent"
+                  className="w-full border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10 bg-transparent"
                 >
                   Home
                 </Button>

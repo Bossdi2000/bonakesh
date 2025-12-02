@@ -50,30 +50,30 @@ export default function DashboardLayout({ admin, user, children }: any) {
   const isActive = (href: string) => pathname === href
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-950 dark:to-slate-900">
+    <div className="min-h-screen bg-white dark:bg-[#0f0b0c]">
       {/* Header */}
-      <header className="border-b border-slate-700 dark:border-slate-600 bg-slate-800/50 dark:bg-slate-900/50 backdrop-blur sticky top-0 z-40">
+      <header className="border-b border-[#7a1632]/20 bg-white/90 dark:bg-[#1a0d13]/80 backdrop-blur sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden text-slate-300 hover:text-white">
+            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden text-[#7a1632] hover:text-[#66122a] dark:text-white">
               {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
             <Link href="/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 dark:bg-blue-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">D</span>
+              <div className="w-10 h-10 bg-[#7a1632] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">M</span>
               </div>
-              <h1 className="text-xl font-bold text-white hidden sm:inline">DevI</h1>
+              <h1 className="text-xl font-bold text-[#7a1632] dark:text-white hidden sm:inline">MARSHALL ETHEL</h1>
             </Link>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium text-white">{admin?.full_name || user?.email}</p>
-              <p className="text-xs text-slate-400 capitalize">{admin?.role?.replace("_", " ")}</p>
+              <p className="text-sm font-medium text-[#7a1632] dark:text-white">{admin?.full_name || user?.email}</p>
+              <p className="text-xs text-neutral-600 dark:text-white/70 capitalize">{admin?.role?.replace("_", " ")}</p>
             </div>
             {mounted && (
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg bg-slate-700 dark:bg-slate-700 hover:bg-slate-600 dark:hover:bg-slate-600 text-slate-300 hover:text-white transition-colors"
+                className="p-2 rounded-lg bg-neutral-100 dark:bg-[#2a1620] hover:bg-neutral-200 dark:hover:bg-[#3a1a28] text-[#7a1632] dark:text-white transition-colors"
                 aria-label="Toggle dark mode"
               >
                 {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
@@ -84,7 +84,7 @@ export default function DashboardLayout({ admin, user, children }: any) {
               disabled={isLoading}
               variant="outline"
               size="sm"
-              className="border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent"
+              className="border-[#7a1632]/40 text-[#7a1632] hover:bg-[#7a1632]/10 bg-transparent dark:text-white"
             >
               <LogOut className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Logout</span>
@@ -99,7 +99,7 @@ export default function DashboardLayout({ admin, user, children }: any) {
         <aside
           className={`${
             sidebarOpen ? "block" : "hidden"
-          } md:block w-full md:w-64 border-r border-slate-700 dark:border-slate-600 bg-slate-800 dark:bg-slate-900 p-4 fixed md:static md:h-[calc(100vh-73px)] z-30`}
+          } md:block w-full md:w-64 border-r border-[#7a1632]/20 bg-white dark:bg-[#1a0d13] p-4 fixed md:static md:h-[calc(100vh-73px)] z-30`}
         >
           <nav className="space-y-2">
             {menuItems.map((item) => {
@@ -112,8 +112,8 @@ export default function DashboardLayout({ admin, user, children }: any) {
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
                     active
-                      ? "bg-blue-600 dark:bg-blue-600 text-white"
-                      : "text-slate-300 hover:bg-slate-700 dark:hover:bg-slate-700"
+                      ? "bg-[#7a1632] text-white"
+                      : "text-[#7a1632] hover:bg-[#7a1632]/10 dark:text-white dark:hover:bg-white/10"
                   }`}
                 >
                   <Icon className="w-5 h-5" />

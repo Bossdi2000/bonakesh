@@ -149,20 +149,20 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
           </TabsList>
         </Tabs>
         <div className="flex gap-2 ml-4">
-          <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700" onClick={() => window.print()}>Print</Button>
-          <Button className="bg-blue-600 hover:bg-blue-700" onClick={exportPdf}>Export PDF</Button>
+          <Button variant="outline" className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10" onClick={() => window.print()}>Print</Button>
+          <Button className="bg-[#7a1632] hover:bg-[#66122a] text-white" onClick={exportPdf}>Export PDF</Button>
         </div>
       </div>
 
-      <Card className="mb-6 border-slate-700 bg-slate-800/50">
+      <Card className="mb-6 border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
           <div>
-            <Label className="text-slate-300">Payment Method</Label>
+            <Label className="text-neutral-700 dark:text-white/80">Payment Method</Label>
             <Select value={method || "all"} onValueChange={onMethodChange}>
-              <SelectTrigger className="bg-slate-700 border-slate-600 text-white mt-1">
+              <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white mt-1">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-slate-700 border-slate-600">
+              <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
                 <SelectItem value="all" className="text-white">All</SelectItem>
                 <SelectItem value="cash" className="text-white">Cash</SelectItem>
                 <SelectItem value="transfer" className="text-white">Bank Transfer</SelectItem>
@@ -172,12 +172,12 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
             </Select>
           </div>
           <div>
-            <Label className="text-slate-300">Admin</Label>
+            <Label className="text-neutral-700 dark:text-white/80">Admin</Label>
             <Select value={adminFilter || "all"} onValueChange={onAdminChange}>
-              <SelectTrigger className="bg-slate-700 border-slate-600 text-white mt-1">
+              <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white mt-1">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-slate-700 border-slate-600 max-h-64 overflow-auto">
+              <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 max-h-64 overflow-auto">
                 <SelectItem value="all" className="text-white">All</SelectItem>
                 {(admins || []).map((a: any) => (
                   <SelectItem key={a.id} value={a.id} className="text-white">{a.full_name || a.id}</SelectItem>
@@ -189,21 +189,21 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
       </Card>
 
       {period === "custom" && (
-        <Card className="mb-6 border-slate-700 bg-slate-800/50">
+        <Card className="mb-6 border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
           <CardHeader>
             <CardTitle className="text-white">Select Custom Period</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label className="text-slate-300">Start Date</Label>
-              <Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} className="bg-slate-700 border-slate-600 text-white" />
+              <Label className="text-neutral-700 dark:text-white/80">Start Date</Label>
+              <Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white" />
             </div>
             <div>
-              <Label className="text-slate-300">End Date</Label>
-              <Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} className="bg-slate-700 border-slate-600 text-white" />
+              <Label className="text-neutral-700 dark:text-white/80">End Date</Label>
+              <Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white" />
             </div>
             <div className="flex items-end">
-              <Button onClick={onApplyCustom} disabled={!customStart || !customEnd} className="w-full bg-blue-600 hover:bg-blue-700">Apply</Button>
+              <Button onClick={onApplyCustom} disabled={!customStart || !customEnd} className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white">Apply</Button>
             </div>
           </CardContent>
         </Card>
@@ -213,7 +213,7 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
         {isLoading || !report ? (
           <>
             {Array.from({ length: 6 }).map((_, i) => (
-              <Card key={i} className="border-slate-700 bg-slate-800/50">
+              <Card key={i} className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
                 <CardHeader>
                   <Skeleton className="h-5 w-32" />
                 </CardHeader>
@@ -225,27 +225,27 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
           </>
         ) : (
           <>
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
               <CardHeader><CardTitle className="text-white">Sales Count</CardTitle></CardHeader>
               <CardContent className="text-2xl font-semibold text-white">{report?.totals?.salesCount || 0}</CardContent>
             </Card>
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
               <CardHeader><CardTitle className="text-white">Sales Value</CardTitle></CardHeader>
               <CardContent className="text-2xl font-semibold text-green-500">{formatCurrency(report?.totals?.salesValue || 0)}</CardContent>
             </Card>
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
               <CardHeader><CardTitle className="text-white">Buying Cost</CardTitle></CardHeader>
               <CardContent className="text-2xl font-semibold text-white">{formatCurrency(report?.totals?.buyingCost || 0)}</CardContent>
             </Card>
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
               <CardHeader><CardTitle className="text-white">Gross Profit</CardTitle></CardHeader>
               <CardContent className="text-2xl font-semibold text-white">{formatCurrency(report?.totals?.grossProfit || 0)}</CardContent>
             </Card>
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
               <CardHeader><CardTitle className="text-white">Salaries Deducted</CardTitle></CardHeader>
               <CardContent className="text-2xl font-semibold text-white">{formatCurrency(report?.totals?.salariesDeducted || 0)}</CardContent>
             </Card>
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
               <CardHeader><CardTitle className="text-white">Net Profit</CardTitle></CardHeader>
               <CardContent className="text-2xl font-semibold text-white">{formatCurrency(report?.totals?.netProfit || 0)}</CardContent>
             </Card>
@@ -254,7 +254,7 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-        <Card className="border-slate-700 bg-slate-800/50">
+        <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
           <CardHeader><CardTitle className="text-white">Top-Selling Products</CardTitle></CardHeader>
           <CardContent>
             {isLoading || !report ? (
@@ -292,7 +292,7 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
           </CardContent>
         </Card>
         
-        <Card className="border-slate-700 bg-slate-800/50">
+        <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
           <CardHeader><CardTitle className="text-white">Admin Activity</CardTitle></CardHeader>
           <CardContent>
             {isLoading || !report ? (
@@ -336,39 +336,39 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
         </Card>
       </div>
 
-      <Card className="mt-6 border-slate-700 bg-slate-800/50">
+      <Card className="mt-6 border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
         <CardHeader>
-          <CardTitle className="text-white">Compare Sales</CardTitle>
+          <CardTitle className="text-neutral-900 dark:text-white">Compare Sales</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <Button variant={compareMode === "day" ? "default" : "outline"} onClick={() => setCompareMode("day")} className={compareMode === "day" ? "bg-slate-600" : "border-slate-600 text-slate-300"}>Day vs Day</Button>
-            <Button variant={compareMode === "week" ? "default" : "outline"} onClick={() => setCompareMode("week")} className={compareMode === "week" ? "bg-slate-600" : "border-slate-600 text-slate-300"}>Week vs Week</Button>
-            <Button variant={compareMode === "month" ? "default" : "outline"} onClick={() => setCompareMode("month")} className={compareMode === "month" ? "bg-slate-600" : "border-slate-600 text-slate-300"}>Month vs Month</Button>
-            <Button variant={compareMode === "year" ? "default" : "outline"} onClick={() => setCompareMode("year")} className={compareMode === "year" ? "bg-slate-600" : "border-slate-600 text-slate-300"}>Year vs Year</Button>
+            <Button variant={compareMode === "day" ? "default" : "outline"} onClick={() => setCompareMode("day")} className={compareMode === "day" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>Day vs Day</Button>
+            <Button variant={compareMode === "week" ? "default" : "outline"} onClick={() => setCompareMode("week")} className={compareMode === "week" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>Week vs Week</Button>
+            <Button variant={compareMode === "month" ? "default" : "outline"} onClick={() => setCompareMode("month")} className={compareMode === "month" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>Month vs Month</Button>
+            <Button variant={compareMode === "year" ? "default" : "outline"} onClick={() => setCompareMode("year")} className={compareMode === "year" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>Year vs Year</Button>
           </div>
           {cmpData.length === 2 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={cmpData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="label" stroke="#94a3b8" />
-                    <YAxis tickFormatter={(v) => `₦${Number(v||0).toLocaleString("en-NG")}`} stroke="#94a3b8" />
-                    <Tooltip formatter={(v:any)=>[`₦${Number(v||0).toLocaleString("en-NG")}`, "Sales Value"]} labelFormatter={(l:any)=>String(l)} contentStyle={{ background: "#1f2937", border: "1px solid #334155", color: "#fff" }} />
-                    <Bar dataKey="value" fill="#3b82f6" radius={[4,4,0,0]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#d7b0bd" />
+                    <XAxis dataKey="label" stroke="#7a1632" />
+                    <YAxis tickFormatter={(v) => `₦${Number(v||0).toLocaleString("en-NG")}`} stroke="#7a1632" />
+                    <Tooltip formatter={(v:any)=>[`₦${Number(v||0).toLocaleString("en-NG")}`, "Sales Value"]} labelFormatter={(l:any)=>String(l)} contentStyle={{ background: "#ffffff", border: "1px solid #7a1632", color: "#111" }} />
+                    <Bar dataKey="value" fill="#7a1632" radius={[4,4,0,0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
               <div className="space-y-3">
-                <div className="text-slate-300">{prevLabel}: <span className="text-white font-semibold">{formatCurrency(prevVal)}</span> • {cmpData[0]?.count || 0} sales</div>
-                <div className="text-slate-300">{currLabel}: <span className="text-white font-semibold">{formatCurrency(currVal)}</span> • {cmpData[1]?.count || 0} sales</div>
-                <div className="text-slate-300">Change: <span className={delta>=0?"text-green-500":"text-red-500"}>{delta>=0?"+":""}{formatCurrency(Math.abs(delta))}</span> (<span className={pct>=0?"text-green-500":"text-red-500"}>{pct>=0?"+":""}{pct.toFixed(1)}%</span>)</div>
-                <div className="text-slate-400 text-sm">{delta>=0?"Sales improved":"Sales declined"} compared to the previous period.</div>
+                <div className="text-neutral-700 dark:text-white/80">{prevLabel}: <span className="text-neutral-900 dark:text-white font-semibold">{formatCurrency(prevVal)}</span> • {cmpData[0]?.count || 0} sales</div>
+                <div className="text-neutral-700 dark:text-white/80">{currLabel}: <span className="text-neutral-900 dark:text-white font-semibold">{formatCurrency(currVal)}</span> • {cmpData[1]?.count || 0} sales</div>
+                <div className="text-neutral-700 dark:text-white/80">Change: <span className={delta>=0?"text-green-500":"text-red-500"}>{delta>=0?"+":""}{formatCurrency(Math.abs(delta))}</span> (<span className={pct>=0?"text-green-500":"text-red-500"}>{pct>=0?"+":""}{pct.toFixed(1)}%</span>)</div>
+                <div className="text-neutral-600 dark:text-white/70 text-sm">{delta>=0?"Sales improved":"Sales declined"} compared to the previous period.</div>
               </div>
             </div>
           ) : (
-            <div className="text-slate-400">No data available for comparison.</div>
+            <div className="text-neutral-600 dark:text-white/70">No data available for comparison.</div>
           )}
         </CardContent>
       </Card>

@@ -264,8 +264,8 @@ export default function CheckoutContent({ admin, products, user }: any) {
       <DashboardLayout admin={admin} user={user}>
         <div className="space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-white">Transaction Receipt</h1>
-            <p className="text-slate-400 mt-1">Order completed successfully</p>
+            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Transaction Receipt</h1>
+            <p className="text-neutral-600 dark:text-white/70 mt-1">Order completed successfully</p>
           </div>
 
           <Receipt
@@ -280,7 +280,7 @@ export default function CheckoutContent({ admin, products, user }: any) {
           />
 
           <div className="flex gap-3 justify-center">
-            <Button onClick={handlePrintReceipt} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handlePrintReceipt} className="bg-[#7a1632] hover:bg-[#66122a] text-white">
               <Printer className="w-4 h-4 mr-2" />
               Print
             </Button>
@@ -290,7 +290,7 @@ export default function CheckoutContent({ admin, products, user }: any) {
                 setCart([])
               }}
               variant="outline"
-              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+              className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
             >
               New Transaction
             </Button>
@@ -303,21 +303,21 @@ export default function CheckoutContent({ admin, products, user }: any) {
   return (
     <DashboardLayout admin={admin} user={user}>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Checkout</h1>
-          <p className="text-slate-400 mt-1">Process customer sales</p>
+          <div>
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Checkout</h1>
+          <p className="text-neutral-600 dark:text-white/70 mt-1">Process customer sales</p>
           <div className="mt-2">
             <Button
               variant="outline"
               onClick={() => window.open(`/dashboard/checkout/view?admin=${admin?.id}`, "customer_view", "width=480,height=800")}
-              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+              className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
             >
               Open Customer View
             </Button>
             <Button
               variant="outline"
               onClick={() => setHoldsOpen(true)}
-              className="ml-2 border-slate-600 text-slate-300 hover:bg-slate-700"
+              className="ml-2 border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
             >
               View Holds
             </Button>
@@ -327,22 +327,22 @@ export default function CheckoutContent({ admin, products, user }: any) {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Add Products */}
           <div className="lg:col-span-2 space-y-4">
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
               <CardHeader>
-                <CardTitle className="text-white">Add Products</CardTitle>
+                <CardTitle className="text-neutral-900 dark:text-white">Add Products</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label className="text-slate-300">Product</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">Product</Label>
                   <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search products by name or SKU"
-                    className="bg-slate-700 border-slate-600 text-white mt-1"
+                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white mt-1"
                   />
                   <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
                     <div className="md:col-span-2">
-                      <div className="max-h-64 overflow-auto rounded border border-slate-700">
+                      <div className="max-h-64 overflow-auto rounded border border-[#7a1632]/30">
                         {(searchQuery ? products.filter((p: any) => {
                           const q = searchQuery.trim().toLowerCase()
                           const name = String(p.name || "").toLowerCase()
@@ -353,47 +353,47 @@ export default function CheckoutContent({ admin, products, user }: any) {
                             key={p.id}
                             type="button"
                             onClick={() => setSelectedProductId(p.id)}
-                            className={`flex w-full items-center justify-between px-3 py-2 text-left hover:bg-slate-700 ${selectedProductId === p.id ? "bg-slate-700" : ""}`}
+                            className={`flex w-full items-center justify-between px-3 py-2 text-left hover:bg-[#7a1632]/10 dark:hover:bg-white/10 ${selectedProductId === p.id ? "bg-[#7a1632]/10 dark:bg-white/10" : ""}`}
                           >
                             <div>
-                              <div className="font-medium text-white">{p.name}</div>
-                              <div className="text-xs text-slate-400">{p.sku || "No SKU"}</div>
+                              <div className="font-medium text-neutral-900 dark:text-white">{p.name}</div>
+                              <div className="text-xs text-neutral-600 dark:text-white/70">{p.sku || "No SKU"}</div>
                             </div>
-                            <div className="text-sm text-slate-300">₦{Number(p.selling_price || 0).toLocaleString("en-NG")}</div>
-                            <div className="ml-3 text-xs text-slate-400">{p.quantity} in stock</div>
+                            <div className="text-sm text-neutral-700 dark:text-white/80">₦{Number(p.selling_price || 0).toLocaleString("en-NG")}</div>
+                            <div className="ml-3 text-xs text-neutral-600 dark:text-white/70">{p.quantity} in stock</div>
                           </button>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <Label className="text-slate-300">Scan SKU</Label>
+                      <Label className="text-neutral-700 dark:text-white/80">Scan SKU</Label>
                       <Input
                         value={scanInput}
                         onChange={(e) => setScanInput(e.target.value)}
                         onKeyDown={handleScanEnter}
                         placeholder="Focus and scan barcode/SKU"
-                        className="bg-slate-700 border-slate-600 text-white mt-1"
+                        className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white mt-1"
                       />
                     </div>
                   </div>
                   {selectedProductId && (
-                    <p className="mt-2 text-xs text-slate-400">Selected product ready to add</p>
+                    <p className="mt-2 text-xs text-neutral-600 dark:text-white/70">Selected product ready to add</p>
                   )}
                 </div>
                 <div>
-                  <Label className="text-slate-300">Quantity</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">Quantity</Label>
                   <Input
                     type="number"
                     min="1"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
-                    className="bg-slate-700 border-slate-600 text-white"
+                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                   />
                 </div>
                 <Button
                   onClick={handleAddToCart}
                   disabled={isLoading || !selectedProductId}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add to Cart
@@ -402,9 +402,9 @@ export default function CheckoutContent({ admin, products, user }: any) {
             </Card>
 
             {/* Cart Items */}
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
               <CardHeader>
-                <CardTitle className="text-white">Cart Items</CardTitle>
+                <CardTitle className="text-neutral-900 dark:text-white">Cart Items</CardTitle>
               </CardHeader>
               <CardContent>
                 {cart.length > 0 ? (
@@ -412,15 +412,15 @@ export default function CheckoutContent({ admin, products, user }: any) {
                     {cart.map((item) => (
                       <div
                         key={item.product_id}
-                        className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-[#7a1632]/5 dark:bg-white/5 rounded-lg"
                       >
                         <div className="flex-1">
-                          <p className="text-white font-medium">{item.name}</p>
-                          <p className="text-slate-400 text-sm">
+                          <p className="text-neutral-900 dark:text-white font-medium">{item.name}</p>
+                          <p className="text-neutral-600 dark:text-white/70 text-sm">
                             {item.quantity} x ₦{item.price_per_unit.toLocaleString("en-NG")}
                           </p>
                           <div className="mt-2 flex items-center gap-2">
-                            <Label className="text-slate-300 text-xs">Override price</Label>
+                            <Label className="text-neutral-700 dark:text-white/80 text-xs">Override price</Label>
                             <Input
                               type="number"
                               value={item.price_per_unit}
@@ -432,12 +432,12 @@ export default function CheckoutContent({ admin, products, user }: any) {
                                     : ci
                                 )))
                               }}
-                              className="bg-slate-700 border-slate-600 text-white w-28 h-8"
+                              className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white w-28 h-8"
                             />
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-white font-semibold">₦{item.total_price.toLocaleString("en-NG")}</p>
+                          <p className="text-neutral-900 dark:text-white font-semibold">₦{item.total_price.toLocaleString("en-NG")}</p>
                           <Button
                             variant="outline"
                             size="sm"
@@ -451,7 +451,7 @@ export default function CheckoutContent({ admin, products, user }: any) {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-slate-400 text-center py-8">Cart is empty</p>
+                  <p className="text-neutral-600 dark:text-white/70 text-center py-8">Cart is empty</p>
                 )}
               </CardContent>
             </Card>
@@ -459,70 +459,70 @@ export default function CheckoutContent({ admin, products, user }: any) {
 
           {/* Summary & Checkout */}
           <div className="space-y-4">
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
               <CardHeader>
-                <CardTitle className="text-white">Order Summary</CardTitle>
+                <CardTitle className="text-neutral-900 dark:text-white">Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2 border-b border-slate-700 pb-4">
-                  <div className="flex justify-between text-slate-300">
+                <div className="space-y-2 border-b border-[#7a1632]/30 pb-4">
+                  <div className="flex justify-between text-neutral-700 dark:text-white/80">
                     <span>Items:</span>
                     <span>{cart.length}</span>
                   </div>
-                  <div className="flex justify-between text-slate-300">
+                  <div className="flex justify-between text-neutral-700 dark:text-white/80">
                     <span>Total Amount:</span>
-                    <span className="text-lg font-bold text-green-500">₦{totalAmount.toLocaleString("en-NG")}</span>
+                    <span className="text-lg font-bold text-[#7a1632] dark:text-white">₦{totalAmount.toLocaleString("en-NG")}</span>
                   </div>
                 </div>
 
                 {/* Customer Details */}
                 <div className="space-y-3">
                   <div>
-                    <Label className="text-slate-300">Customer Name</Label>
+                    <Label className="text-neutral-700 dark:text-white/80">Customer Name</Label>
                     <Input
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       placeholder="Full name"
-                      className="bg-slate-700 border-slate-600 text-white"
+                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                     />
                   </div>
                   <div>
-                    <Label className="text-slate-300">Address</Label>
+                    <Label className="text-neutral-700 dark:text-white/80">Address</Label>
                     <Input
                       value={customerAddress}
                       onChange={(e) => setCustomerAddress(e.target.value)}
                       placeholder="Address"
-                      className="bg-slate-700 border-slate-600 text-white"
+                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                     />
                   </div>
                   <div>
-                    <Label className="text-slate-300">Phone Number</Label>
+                    <Label className="text-neutral-700 dark:text-white/80">Phone Number</Label>
                     <Input
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
                       placeholder="e.g. 08012345678"
-                      className="bg-slate-700 border-slate-600 text-white"
+                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label className="text-slate-300">Payment Method</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">Payment Method</Label>
                   <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-700 border-slate-600">
-                      <SelectItem value="cash" className="text-white">
+                    <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                      <SelectItem value="cash" className="text-neutral-900 dark:text-white">
                         Cash
                       </SelectItem>
-                      <SelectItem value="transfer" className="text-white">
+                      <SelectItem value="transfer" className="text-neutral-900 dark:text-white">
                         Bank Transfer
                       </SelectItem>
-                      <SelectItem value="pos" className="text-white">
+                      <SelectItem value="pos" className="text-neutral-900 dark:text-white">
                         POS
                       </SelectItem>
-                      <SelectItem value="card" className="text-white">
+                      <SelectItem value="card" className="text-neutral-900 dark:text-white">
                         Card
                       </SelectItem>
                     </SelectContent>
@@ -534,14 +534,14 @@ export default function CheckoutContent({ admin, products, user }: any) {
                     variant="outline"
                     onClick={handleHoldCart}
                     disabled={isLoading || cart.length === 0}
-                    className="border-slate-600 text-slate-300 hover:bg-slate-700 w-1/2"
+                    className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10 w-1/2"
                   >
                     Hold Cart
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => setHoldsOpen(true)}
-                    className="border-slate-600 text-slate-300 hover:bg-slate-700 w-1/2"
+                    className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10 w-1/2"
                   >
                     Resume Holds
                   </Button>
@@ -550,7 +550,7 @@ export default function CheckoutContent({ admin, products, user }: any) {
                 <Button
                   onClick={handleCompleteCheckout}
                   disabled={isLoading || cart.length === 0}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white"
                 >
                   <CheckCircle className="w-4 h-4 mr-2" />
                   Complete Sale
@@ -561,22 +561,22 @@ export default function CheckoutContent({ admin, products, user }: any) {
         </div>
       </div>
       <Dialog open={holdsOpen} onOpenChange={setHoldsOpen}>
-        <DialogContent className="bg-slate-800 border-slate-700 max-w-2xl">
+        <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30 max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-white">Held Carts</DialogTitle>
+            <DialogTitle className="text-neutral-900 dark:text-white">Held Carts</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             {holds.length === 0 ? (
-              <p className="text-slate-400">No held carts</p>
+              <p className="text-neutral-600 dark:text-white/70">No held carts</p>
             ) : (
               holds.map((h) => (
-                <div key={h.id} className="flex items-center justify-between border border-slate-700 rounded p-3">
+                <div key={h.id} className="flex items-center justify-between border border-[#7a1632]/30 rounded p-3">
                   <div className="text-sm">
-                    <div className="text-white font-medium">{h.customer?.name || "Unnamed"}</div>
-                    <div className="text-slate-400">{new Date(h.created_at).toLocaleString()} • {h.cart.length} item(s) • ₦{Number(h.totalAmount||0).toLocaleString("en-NG")}</div>
+                    <div className="text-neutral-900 dark:text-white font-medium">{h.customer?.name || "Unnamed"}</div>
+                    <div className="text-neutral-600 dark:text-white/70">{new Date(h.created_at).toLocaleString()} • {h.cart.length} item(s) • ₦{Number(h.totalAmount||0).toLocaleString("en-NG")}</div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" className="border-slate-600" onClick={() => resumeHold(h.id)}>Resume</Button>
+                    <Button variant="outline" className="border-[#7a1632]/30" onClick={() => resumeHold(h.id)}>Resume</Button>
                     <Button variant="outline" className="border-red-600 text-red-500" onClick={() => deleteHold(h.id)}>Delete</Button>
                   </div>
                 </div>

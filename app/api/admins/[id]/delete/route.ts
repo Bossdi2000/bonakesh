@@ -25,6 +25,32 @@ export async function POST(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
+    if (id === user.id) {
+      return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 })
+    }
+
+    // Reassign foreign key references to the acting super admin to satisfy FK constraints
+    // Products.created_by → user.id
+    const { error: prodReassignErr } = await service
+      .from("products")
+      .update({ created_by: user.id })
+      .eq("created_by", id)
+    if (prodReassignErr) return NextResponse.json({ error: prodReassignErr.message }, { status: 500 })
+
+    // Transactions.admin_id → user.id
+    const { error: txReassignErr } = await service
+      .from("transactions")
+      .update({ admin_id: user.id })
+      .eq("admin_id", id)
+    if (txReassignErr) return NextResponse.json({ error: txReassignErr.message }, { status: 500 })
+
+    // Activity log admin_id → user.id (preserve logs while freeing FK)
+    const { error: logReassignErr } = await service
+      .from("activity_log")
+      .update({ admin_id: user.id })
+      .eq("admin_id", id)
+    if (logReassignErr) return NextResponse.json({ error: logReassignErr.message }, { status: 500 })
+
     // use service client for privileged delete
     const { error } = await service.auth.admin.deleteUser(id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })

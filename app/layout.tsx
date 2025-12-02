@@ -9,8 +9,8 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "DevI Inventory & Salary Management",
-  description: "Smart Store Control for Modern Businesses",
+  title: "Marshall-ethel",
+  description: "Inventory and Salary Management System",
   generator: "v0.app",
 }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import DashboardLayout from "./dashboard-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -10,6 +10,10 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
+import { createClient } from "@/lib/supabase/client"
+import Receipt from "./receipt"
+import { Printer } from "lucide-react"
+import { snackbar } from "@/lib/ui/snackbar"
 
 export default function HistoryContent({ admin, logs, user }: any) {
   const [searchTerm, setSearchTerm] = useState("")
@@ -19,6 +23,16 @@ export default function HistoryContent({ admin, logs, user }: any) {
   const [endDate, setEndDate] = useState<string>("")
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState<any | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const [reprintOpen, setReprintOpen] = useState(false)
+  const [reprintTransaction, setReprintTransaction] = useState<any | null>(null)
+  const [receiptItems, setReceiptItems] = useState<any[]>([])
+  const [customerName, setCustomerName] = useState("")
+  const [customerAddress, setCustomerAddress] = useState("")
+  const [customerPhone, setCustomerPhone] = useState("")
+  const receiptRef = useRef<HTMLDivElement | null>(null)
+  const supabase = createClient()
 
   const actionTypes = Array.from(
     new Set<string>((logs || []).map((l: any) => String(l.action_type || "")))
@@ -76,73 +90,133 @@ export default function HistoryContent({ admin, logs, user }: any) {
     if (actionType.includes("delete")) return "bg-red-600"
     if (actionType.includes("create")) return "bg-green-600"
     if (actionType.includes("update") || actionType.includes("changed")) return "bg-yellow-600"
-    return "bg-blue-600"
+    return "bg-[#7a1632]"
   }
 
+  const handleReprint = async (log: any) => {
+    if (!log || log.entity_type !== "transaction") return
+    setIsLoading(true)
+    try {
+      const txId = log.entity_id
+      const { data: txRecord, error: txErr } = await supabase
+        .from("transactions")
+        .select("id,total_amount,payment_method,transaction_date")
+        .eq("id", txId)
+        .maybeSingle()
+      if (txErr) throw new Error(txErr.message)
+
+      const { data: items, error: itemsErr } = await supabase
+        .from("transaction_items")
+        .select("product_id,quantity,price_per_unit,total_price")
+        .eq("transaction_id", txId)
+      if (itemsErr) throw new Error(itemsErr.message)
+
+      const productIds = Array.from(new Set((items || []).map((it: any) => it.product_id)))
+      let namesMap: Record<string, string> = {}
+      if (productIds.length > 0) {
+        const { data: products, error: prodErr } = await supabase
+          .from("products")
+          .select("id,name")
+          .in("id", productIds)
+        if (prodErr) throw new Error(prodErr.message)
+        for (const p of products || []) namesMap[p.id as string] = String(p.name || "")
+      }
+
+      const withNames = (items || []).map((it: any) => ({
+        product_id: it.product_id,
+        name: namesMap[it.product_id] || "",
+        price_per_unit: Number(it.price_per_unit || 0),
+        quantity: Number(it.quantity || 0),
+        total_price: Number(it.total_price || 0),
+      }))
+
+      setReprintTransaction(txRecord || { id: txId, total_amount: Number(log?.details?.total_amount || 0), payment_method: String(log?.details?.payment_method || "cash"), transaction_date: log?.created_at })
+      setReceiptItems(withNames)
+      setCustomerName(String(log?.details?.customer_name || ""))
+      setCustomerAddress(String(log?.details?.customer_address || ""))
+      setCustomerPhone(String(log?.details?.customer_phone || ""))
+      setReprintOpen(true)
+    } catch (e: any) {
+      snackbar.error(String(e?.message || "Failed to prepare receipt"))
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handlePrintReceipt = () => {
+    if (!receiptRef.current) return
+    const printWindow = window.open("", "", "width=600,height=800")
+    if (printWindow) {
+      printWindow.document.write(receiptRef.current.innerHTML)
+      printWindow.document.close()
+      printWindow.print()
+      snackbar.info("Receipt ready to print")
+    }
+  }
 
   return (
     <DashboardLayout admin={admin} user={user}>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">Activity Log</h1>
-          <p className="text-slate-400 mt-1">Complete history of all system actions</p>
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Activity Log</h1>
+          <p className="text-neutral-600 dark:text-white/70 mt-1">Complete history of all system actions</p>
         </div>
 
-        <Card className="border-slate-700 bg-slate-800/50">
+        <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
           <CardHeader>
-            <CardTitle className="text-white">Search & Filter</CardTitle>
+            <CardTitle className="text-neutral-900 dark:text-white">Search & Filter</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 variant={actionType === "all" ? "default" : "outline"}
                 onClick={() => setActionType("all")}
-                className={actionType === "all" ? "bg-slate-600" : "border-slate-600 text-slate-300"}
+                className={actionType === "all" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}
               >
                 All ({totalCount})
               </Button>
               <Button
                 variant={actionType === "login_success" ? "default" : "outline"}
                 onClick={() => setActionType("login_success")}
-                className={actionType === "login_success" ? "bg-slate-600" : "border-slate-600 text-slate-300"}
+                className={actionType === "login_success" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}
               >
                 Logins ({loginSuccessCount})
               </Button>
               <Button
                 variant={actionType === "login_failure" ? "default" : "outline"}
                 onClick={() => setActionType("login_failure")}
-                className={actionType === "login_failure" ? "bg-slate-600" : "border-slate-600 text-slate-300"}
+                className={actionType === "login_failure" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}
               >
                 Failures ({loginFailureCount})
               </Button>
               <Button
                 variant={actionType === "logout" ? "default" : "outline"}
                 onClick={() => setActionType("logout")}
-                className={actionType === "logout" ? "bg-slate-600" : "border-slate-600 text-slate-300"}
+                className={actionType === "logout" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}
               >
                 Logouts ({logoutCount})
               </Button>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <Label className="text-slate-300">Search</Label>
+                <Label className="text-neutral-700 dark:text-white/80">Search</Label>
                 <Input
                   placeholder="Search actions, items..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-slate-700 border-slate-600 text-white"
+                  className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                 />
               </div>
               <div>
-                <Label className="text-slate-300">Admin</Label>
+                <Label className="text-neutral-700 dark:text-white/80">Admin</Label>
                 <Select value={adminName} onValueChange={setAdminName}>
-                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                  <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
                     <SelectValue placeholder="All admins" />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-700 border-slate-600">
-                    <SelectItem value="all" className="text-white">All</SelectItem>
+                  <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                    <SelectItem value="all" className="text-neutral-900 dark:text-white">All</SelectItem>
                     {adminNames.map((n: string) => (
-                      <SelectItem key={n} value={n} className="text-white">
+                      <SelectItem key={n} value={n} className="text-neutral-900 dark:text-white">
                         {n}
                       </SelectItem>
                     ))}
@@ -150,15 +224,15 @@ export default function HistoryContent({ admin, logs, user }: any) {
                 </Select>
               </div>
               <div>
-                <Label className="text-slate-300">Action Type</Label>
+                <Label className="text-neutral-700 dark:text-white/80">Action Type</Label>
                 <Select value={actionType} onValueChange={setActionType}>
-                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                  <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
                     <SelectValue placeholder="All actions" />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-700 border-slate-600">
-                    <SelectItem value="all" className="text-white">All</SelectItem>
+                  <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                    <SelectItem value="all" className="text-neutral-900 dark:text-white">All</SelectItem>
                     {actionTypes.map((t: string) => (
-                      <SelectItem key={t} value={t} className="text-white">
+                      <SelectItem key={t} value={t} className="text-neutral-900 dark:text-white">
                         {t.replace("_", " ")}
                       </SelectItem>
                     ))}
@@ -166,21 +240,21 @@ export default function HistoryContent({ admin, logs, user }: any) {
                 </Select>
               </div>
               <div>
-                <Label className="text-slate-300">Start Date</Label>
+                <Label className="text-neutral-700 dark:text-white/80">Start Date</Label>
                 <Input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="bg-slate-700 border-slate-600 text-white"
+                  className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                 />
               </div>
               <div>
-                <Label className="text-slate-300">End Date</Label>
+                <Label className="text-neutral-700 dark:text-white/80">End Date</Label>
                 <Input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="bg-slate-700 border-slate-600 text-white"
+                  className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                 />
               </div>
             </div>
@@ -191,7 +265,7 @@ export default function HistoryContent({ admin, logs, user }: any) {
           {!logs ? (
             <>
               {Array.from({ length: 8 }).map((_, i) => (
-                <Card key={i} className="border-slate-700 bg-slate-800/50">
+                <Card key={i} className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 space-y-2">
@@ -208,7 +282,7 @@ export default function HistoryContent({ admin, logs, user }: any) {
             filteredLogs.map((log: any) => (
               <Card
                 key={log.id}
-                className="border-slate-700 bg-slate-800/50 hover:bg-slate-700/50 cursor-pointer"
+                className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13] hover:bg-[#7a1632]/5 dark:hover:bg-white/5 cursor-pointer"
                 onClick={() => {
                   setSelected(log)
                   setOpen(true)
@@ -220,68 +294,81 @@ export default function HistoryContent({ admin, logs, user }: any) {
                       <div className="flex items-center gap-2 mb-1">
                         <Badge className={getActionColor(log.action_type)}>{log.action_type.replace("_", " ")}</Badge>
                         {Array.isArray(log.grouped) && log.grouped.length > 0 && (
-                          <Badge className="bg-slate-600 text-white">+{log.grouped.length} related</Badge>
+                          <Badge className="bg-[#7a1632] text-white">+{log.grouped.length} related</Badge>
                         )}
-                        {log.entity_type && <span className="text-xs text-slate-400">{log.entity_type}</span>}
+                        {log.entity_type && <span className="text-xs text-neutral-600 dark:text-white/70">{log.entity_type}</span>}
                       </div>
-                      <p className="text-slate-300 text-sm">by {log.admins?.full_name || "Unknown"}</p>
+                      <p className="text-neutral-700 dark:text-white/80 text-sm">by {log.admins?.full_name || "Unknown"}</p>
                       {getAffectedItem(log) && (
-                        <p className="text-slate-400 text-xs mt-1">{getAffectedItem(log)}</p>
+                        <p className="text-neutral-600 dark:text-white/70 text-xs mt-1">{getAffectedItem(log)}</p>
                       )}
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-slate-500">{new Date(log.created_at).toLocaleString()}</p>
-                      <a href={`/dashboard/history/${log.id}`} className="text-xs text-blue-400 underline">Open</a>
+                      <p className="text-xs text-neutral-500 dark:text-white/70">{new Date(log.created_at).toLocaleString()}</p>
+                      <div className="flex items-center gap-2 justify-end">
+                        <a href={`/dashboard/history/${log.id}`} className="text-xs text-[#7a1632] underline hover:text-[#66122a]">Open</a>
+                        {log.entity_type === "transaction" ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={isLoading}
+                            onClick={(e) => { e.stopPropagation(); handleReprint(log) }}
+                            className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
+                          >
+                            Reprint
+                          </Button>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             ))
           ) : (
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
               <CardContent className="p-8 text-center">
-                <p className="text-slate-400">No activities found</p>
+                <p className="text-neutral-600 dark:text-white/70">No activities found</p>
               </CardContent>
             </Card>
           )}
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="bg-slate-800 border-slate-700">
+          <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
             <DialogHeader>
-              <DialogTitle className="text-white">Activity Details</DialogTitle>
-              <DialogDescription className="text-slate-400">Full information about the selected activity</DialogDescription>
+              <DialogTitle className="text-neutral-900 dark:text-white">Activity Details</DialogTitle>
+              <DialogDescription className="text-neutral-600 dark:text-white/70">Full information about the selected activity</DialogDescription>
             </DialogHeader>
             {selected && (
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Action</span>
-                  <span className="text-white font-medium">{selected.action_type}</span>
+                  <span className="text-neutral-600 dark:text-white/70">Action</span>
+                  <span className="text-neutral-900 dark:text-white font-medium">{selected.action_type}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Entity</span>
-                  <span className="text-white">{selected.entity_type || "-"}</span>
+                  <span className="text-neutral-600 dark:text-white/70">Entity</span>
+                  <span className="text-neutral-900 dark:text-white">{selected.entity_type || "-"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Entity ID</span>
-                  <span className="text-white">{selected.entity_id || "-"}</span>
+                  <span className="text-neutral-600 dark:text-white/70">Entity ID</span>
+                  <span className="text-neutral-900 dark:text-white">{selected.entity_id || "-"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Admin</span>
-                  <span className="text-white">{selected.admins?.full_name || "Unknown"}</span>
+                  <span className="text-neutral-600 dark:text-white/70">Admin</span>
+                  <span className="text-neutral-900 dark:text-white">{selected.admins?.full_name || "Unknown"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Timestamp</span>
-                  <span className="text-white">{new Date(selected.created_at).toLocaleString()}</span>
+                  <span className="text-neutral-600 dark:text-white/70">Timestamp</span>
+                  <span className="text-neutral-900 dark:text-white">{new Date(selected.created_at).toLocaleString()}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400">Details</span>
-                  <div className="mt-2 rounded bg-slate-700/50 p-3 text-slate-200 break-words">
+                  <span className="text-neutral-600 dark:text-white/70">Details</span>
+                  <div className="mt-2 rounded bg-[#7a1632]/5 dark:bg-white/5 p-3 text-neutral-800 dark:text-white break-words">
                     {typeof selected.details === "object" && selected.details !== null
                       ? Object.entries(selected.details).map(([k, v]) => (
                           <div key={k} className="flex justify-between">
-                            <span className="text-slate-300">{k}</span>
-                            <span className="text-white">{String(v)}</span>
+                            <span className="text-neutral-700 dark:text-white/80">{k}</span>
+                            <span className="text-neutral-900 dark:text-white">{String(v)}</span>
                           </div>
                         ))
                       : String(selected.details || "-")}
@@ -289,20 +376,20 @@ export default function HistoryContent({ admin, logs, user }: any) {
                 </div>
                 {Array.isArray((selected as any).grouped) && (selected as any).grouped.length > 0 && (
                   <div>
-                    <span className="text-slate-400">Related</span>
+                    <span className="text-neutral-600 dark:text-white/70">Related</span>
                     <div className="mt-2 space-y-2">
                       {(selected as any).grouped.map((g: any) => (
-                        <div key={g.id} className="rounded border border-slate-700 p-2">
+                        <div key={g.id} className="rounded border border-[#7a1632]/30 p-2">
                           <div className="flex items-center gap-2">
                             <Badge className={getActionColor(g.action_type)}>{g.action_type.replace("_", " ")}</Badge>
-                            <span className="text-xs text-slate-400">{new Date(g.created_at).toLocaleString()}</span>
+                            <span className="text-xs text-neutral-600 dark:text-white/70">{new Date(g.created_at).toLocaleString()}</span>
                           </div>
-                          <div className="mt-1 rounded bg-slate-700/50 p-2 text-slate-200 break-words">
+                          <div className="mt-1 rounded bg-[#7a1632]/5 dark:bg-white/5 p-2 text-neutral-800 dark:text-white break-words">
                             {typeof g.details === "object" && g.details !== null
                               ? Object.entries(g.details).map(([k, v]) => (
                                   <div key={k} className="flex justify-between">
-                                    <span className="text-slate-300">{k}</span>
-                                    <span className="text-white">{String(v)}</span>
+                                    <span className="text-neutral-700 dark:text-white/80">{k}</span>
+                                    <span className="text-neutral-900 dark:text-white">{String(v)}</span>
                                   </div>
                                 ))
                               : String(g.details || "-")}
@@ -312,8 +399,49 @@ export default function HistoryContent({ admin, logs, user }: any) {
                     </div>
                   </div>
                 )}
+                {selected?.entity_type === "transaction" ? (
+                  <div className="pt-2">
+                    <Button
+                      onClick={() => handleReprint(selected)}
+                      disabled={isLoading}
+                      className="bg-[#7a1632] hover:bg-[#66122a] text-white"
+                    >
+                      <Printer className="w-4 h-4 mr-2" />
+                      Reprint Receipt
+                    </Button>
+                  </div>
+                ) : null}
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={reprintOpen} onOpenChange={setReprintOpen}>
+          <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30 max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-neutral-900 dark:text-white">Transaction Receipt</DialogTitle>
+              <DialogDescription className="text-neutral-600 dark:text-white/70">Reprint of a completed checkout</DialogDescription>
+            </DialogHeader>
+            {reprintTransaction ? (
+              <div className="space-y-3">
+                <Receipt
+                  ref={receiptRef}
+                  transaction={reprintTransaction}
+                  items={receiptItems}
+                  admin={admin}
+                  user={user}
+                  customerName={customerName}
+                  customerAddress={customerAddress}
+                  customerPhone={customerPhone}
+                />
+                <div className="flex justify-center">
+                  <Button onClick={handlePrintReceipt} className="bg-[#7a1632] hover:bg-[#66122a] text-white">
+                    <Printer className="w-4 h-4 mr-2" />
+                    Print
+                  </Button>
+                </div>
+              </div>
+            ) : null}
           </DialogContent>
         </Dialog>
       </div>

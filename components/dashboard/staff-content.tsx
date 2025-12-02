@@ -194,52 +194,52 @@ export default function StaffContent({ admin, staff, user }: any) {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Staff Management</h1>
-            <p className="text-slate-400 mt-1">Manage employees and salaries</p>
+            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Staff Management</h1>
+            <p className="text-neutral-600 dark:text-white/70 mt-1">Manage employees and salaries</p>
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               onClick={() => setClearOpen(true)}
-              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+              className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
             >
               Cleared
             </Button>
             <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => handleOpenDialog()} className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={() => handleOpenDialog()} className="bg-[#7a1632] hover:bg-[#66122a] text-white">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Staff
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-slate-800 border-slate-700">
+            <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
               <DialogHeader>
                 <DialogTitle className="text-white">{editingId ? "Edit Staff Member" : "Add New Staff"}</DialogTitle>
-                <DialogDescription className="text-slate-400">
+                <DialogDescription className="text-neutral-600 dark:text-white/70">
                   {editingId ? "Update staff details" : "Create a new staff member"}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label className="text-slate-300">Full Name</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">Full Name</Label>
                   <Input
                     placeholder="John Doe"
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    className="bg-slate-700 border-slate-600 text-white"
+                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                   />
                 </div>
                 <div>
-                  <Label className="text-slate-300">Job Title</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">Job Title</Label>
                   <Input
                     placeholder="e.g., Sales Associate"
                     value={formData.job_title}
                     onChange={(e) => setFormData({ ...formData, job_title: e.target.value })}
-                    className="bg-slate-700 border-slate-600 text-white"
+                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                   />
                 </div>
                 <div>
-                  <Label className="text-slate-300">Monthly Salary</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">Monthly Salary</Label>
                   <Input
                     type="number"
                     placeholder="0.00"
@@ -250,32 +250,32 @@ export default function StaffContent({ admin, staff, user }: any) {
                         monthly_salary: e.target.value,
                       })
                     }
-                    className="bg-slate-700 border-slate-600 text-white"
-                  />
-                </div>
-                <div>
-                  <Label className="text-slate-300">Employment Status</Label>
+                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                />
+              </div>
+              <div>
+                  <Label className="text-neutral-700 dark:text-white/80">Employment Status</Label>
                   <Select
                     value={formData.employment_status}
                     onValueChange={(value) => setFormData({ ...formData, employment_status: value })}
                   >
-                    <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-700 border-slate-600">
-                      <SelectItem value="active" className="text-white">
+                    <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                      <SelectItem value="active" className="text-neutral-900 dark:text-white">
                         Active
                       </SelectItem>
-                      <SelectItem value="suspended" className="text-white">
+                      <SelectItem value="suspended" className="text-neutral-900 dark:text-white">
                         Suspended
                       </SelectItem>
-                      <SelectItem value="resigned" className="text-white">
+                      <SelectItem value="resigned" className="text-neutral-900 dark:text-white">
                         Resigned
                       </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <Button onClick={handleSaveStaff} disabled={isLoading} className="w-full bg-blue-600 hover:bg-blue-700">
+                <Button onClick={handleSaveStaff} disabled={isLoading} className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white">
                   {isLoading ? "Saving..." : editingId ? "Update Staff" : "Add Staff"}
                 </Button>
               </div>
@@ -286,21 +286,21 @@ export default function StaffContent({ admin, staff, user }: any) {
 
         {/* Summary Cards */}
         <div className="grid md:grid-cols-3 gap-4">
-          <Card className="border-slate-700 bg-slate-800/50">
+          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
             <CardContent className="p-6">
-              <p className="text-slate-400 text-sm mb-1">Active Staff</p>
-              <p className="text-3xl font-bold text-white">{activeStaff}</p>
+              <p className="text-neutral-600 dark:text-white/70 text-sm mb-1">Active Staff</p>
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white">{activeStaff}</p>
             </CardContent>
           </Card>
-          <Card className="border-slate-700 bg-slate-800/50">
+          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
             <CardContent className="p-6">
-              <p className="text-slate-400 text-sm mb-1">Total Monthly Salaries</p>
-              <p className="text-3xl font-bold text-white">₦{totalMonthlySalaries.toLocaleString("en-NG")}</p>
+              <p className="text-neutral-600 dark:text-white/70 text-sm mb-1">Total Monthly Salaries</p>
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white">₦{totalMonthlySalaries.toLocaleString("en-NG")}</p>
             </CardContent>
           </Card>
-          <Card className="border-slate-700 bg-slate-800/50">
+          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
             <CardContent className="p-6">
-              <p className="text-slate-400 text-sm mb-1">Salaries Paid</p>
+              <p className="text-neutral-600 dark:text-white/70 text-sm mb-1">Salaries Paid</p>
               <p className="text-3xl font-bold text-green-500">{paidSalaries}</p>
             </CardContent>
           </Card>
@@ -308,24 +308,24 @@ export default function StaffContent({ admin, staff, user }: any) {
 
         {/* Quick Filters */}
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant={quickFilter === "all" ? "default" : "outline"} onClick={() => setQuickFilter("all")} className={quickFilter === "all" ? "bg-slate-600" : "border-slate-600 text-slate-300"}>All ({staff.length})</Button>
-          <Button variant={quickFilter === "active" ? "default" : "outline"} onClick={() => setQuickFilter("active")} className={quickFilter === "active" ? "bg-slate-600" : "border-slate-600 text-slate-300"}>Active ({activeStaff})</Button>
-          <Button variant={quickFilter === "outline" ? "default" : "outline"} onClick={() => setQuickFilter("paid")} className={quickFilter === "paid" ? "bg-slate-600" : "border-slate-600 text-slate-300"}>Paid ({paidSalaries})</Button>
-          <Button variant={quickFilter === "outline" ? "default" : "outline"} onClick={() => setQuickFilter("pending")} className={quickFilter === "pending" ? "bg-slate-600" : "border-slate-600 text-slate-300"}>Pending ({pendingSalaries})</Button>
-          <Button variant={quickFilter === "outline" ? "default" : "outline"} onClick={() => setQuickFilter("withheld")} className={quickFilter === "withheld" ? "bg-slate-600" : "border-slate-600 text-slate-300"}>Withheld ({withheldSalaries})</Button>
+          <Button variant={quickFilter === "all" ? "default" : "outline"} onClick={() => setQuickFilter("all")} className={quickFilter === "all" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>All ({staff.length})</Button>
+          <Button variant={quickFilter === "active" ? "default" : "outline"} onClick={() => setQuickFilter("active")} className={quickFilter === "active" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>Active ({activeStaff})</Button>
+          <Button variant={quickFilter === "outline" ? "default" : "outline"} onClick={() => setQuickFilter("paid")} className={quickFilter === "paid" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>Paid ({paidSalaries})</Button>
+          <Button variant={quickFilter === "outline" ? "default" : "outline"} onClick={() => setQuickFilter("pending")} className={quickFilter === "pending" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>Pending ({pendingSalaries})</Button>
+          <Button variant={quickFilter === "outline" ? "default" : "outline"} onClick={() => setQuickFilter("withheld")} className={quickFilter === "withheld" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>Withheld ({withheldSalaries})</Button>
         </div>
 
         {/* Reminder Banner */}
         {!bannerDismiss && (
-          <Card className="border-slate-700 bg-yellow-600/10">
+          <Card className="border-[#7a1632]/30 bg-yellow-600/10">
             <CardContent className="p-4 flex items-center justify-between">
-              <div className="text-slate-300">Remember to clear monthly salary statuses.</div>
+              <div className="text-neutral-700 dark:text-white/80">Remember to clear monthly salary statuses.</div>
               <div className="flex gap-2">
-                <Button variant="outline" className="border-slate-600" onClick={dismissBanner}>Dismiss</Button>
+                <Button variant="outline" className="border-[#7a1632]/30" onClick={dismissBanner}>Dismiss</Button>
                 <Button
                   variant="outline"
                   onClick={() => setClearOpen(true)}
-                  className="border-yellow-600 text-yellow-500 hover:bg-yellow-600/10"
+                  className="border-yellow-600 text-yellow-600 hover:bg-yellow-600/10"
                 >
                   Clear Now
                 </Button>
@@ -340,13 +340,13 @@ export default function StaffContent({ admin, staff, user }: any) {
             filteredStaff.map((staffMember: any) => (
               <Card
                 key={staffMember.id}
-                className="border-slate-700 bg-slate-800/50 hover:bg-slate-700/50 transition-colors"
+                className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13] hover:bg-[#7a1632]/5 dark:hover:bg-white/5 transition-colors"
               >
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-semibold text-white">{staffMember.full_name}</h3>
+                        <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">{staffMember.full_name}</h3>
                         <Badge
                           className={
                             staffMember.employment_status === "active"
@@ -359,11 +359,11 @@ export default function StaffContent({ admin, staff, user }: any) {
                           {staffMember.employment_status}
                         </Badge>
                       </div>
-                      <p className="text-slate-400 text-sm mb-2">{staffMember.job_title}</p>
+                      <p className="text-neutral-600 dark:text-white/70 text-sm mb-2">{staffMember.job_title}</p>
                       <div className="flex items-center gap-4 text-sm">
                         <div>
-                          <span className="text-slate-400">Monthly Salary: </span>
-                          <span className="text-white font-semibold">
+                          <span className="text-neutral-600 dark:text-white/70">Monthly Salary: </span>
+                          <span className="text-neutral-900 dark:text-white font-semibold">
                             ₦{staffMember.monthly_salary.toLocaleString("en-NG")}
                           </span>
                         </div>
@@ -388,7 +388,7 @@ export default function StaffContent({ admin, staff, user }: any) {
                         size="sm"
                         onClick={() => handleSetPaymentStatus(staffMember.id, "paid")}
                         disabled={isLoading || staffMember.employment_status !== "active"}
-                        className="border-slate-600 text-green-500 hover:bg-slate-700"
+                        className="border-[#7a1632]/30 text-green-600 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
                       >
                         <CheckCircle className="w-4 h-4" />
                       </Button>
@@ -397,7 +397,7 @@ export default function StaffContent({ admin, staff, user }: any) {
                         size="sm"
                         onClick={() => handleSetPaymentStatus(staffMember.id, "pending")}
                         disabled={isLoading || staffMember.employment_status !== "active"}
-                        className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                        className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
                       >
                         Pending
                       </Button>
@@ -417,7 +417,7 @@ export default function StaffContent({ admin, staff, user }: any) {
                         variant="outline"
                         size="sm"
                         onClick={() => handleOpenDialog(staffMember)}
-                        className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                        className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
@@ -439,24 +439,24 @@ export default function StaffContent({ admin, staff, user }: any) {
               </Card>
             ))
           ) : (
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
               <CardContent className="p-8 text-center">
-                <p className="text-slate-400">No staff members yet</p>
+                <p className="text-neutral-600 dark:text-white/70">No staff members yet</p>
               </CardContent>
             </Card>
           )}
       </div>
       </div>
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent className="bg-slate-800 border-slate-700">
+        <AlertDialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Delete Staff Member</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogTitle className="text-neutral-900 dark:text-white">Delete Staff Member</AlertDialogTitle>
+            <AlertDialogDescription className="text-neutral-600 dark:text-white/70">
               This action cannot be undone. This will permanently remove the staff member.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeleteOpen(false)} className="border-slate-600">Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setDeleteOpen(false)} className="border-[#7a1632]/30">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
                 if (!deleteId) return
@@ -473,15 +473,15 @@ export default function StaffContent({ admin, staff, user }: any) {
       </AlertDialog>
 
       <AlertDialog open={clearOpen} onOpenChange={setClearOpen}>
-        <AlertDialogContent className="bg-slate-800 border-slate-700">
+        <AlertDialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Clear Salary Cycle</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogTitle className="text-neutral-900 dark:text-white">Clear Salary Cycle</AlertDialogTitle>
+            <AlertDialogDescription className="text-neutral-600 dark:text-white/70">
               This will reset paid statuses for active staff.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setClearOpen(false)} className="border-slate-600">Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setClearOpen(false)} className="border-[#7a1632]/30">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
                 setIsLoading(true)
@@ -498,7 +498,7 @@ export default function StaffContent({ admin, staff, user }: any) {
                   setClearOpen(false)
                 }
               }}
-              className="bg-yellow-600 hover:bg-yellow-700"
+              className="bg-[#7a1632] hover:bg-[#66122a] text-white"
             >
               Confirm
             </AlertDialogAction>

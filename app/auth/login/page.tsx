@@ -72,23 +72,23 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0f0b0c] p-4">
       <div className="w-full max-w-md">
-        <Card className="border-slate-700 bg-slate-800">
+        <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
           <CardHeader className="space-y-2">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">D</span>
+              <div className="w-10 h-10 bg-[#7a1632] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">M</span>
               </div>
-              <h1 className="text-2xl font-bold text-white">DevI</h1>
+              <h1 className="text-2xl font-bold text-[#7a1632] dark:text-white">MARSHALL ETHEL</h1>
             </div>
-            <CardTitle className="text-white">Welcome Back</CardTitle>
-            <CardDescription className="text-slate-400">Login to your admin account</CardDescription>
+            <CardTitle className="text-neutral-900 dark:text-white">Welcome Back</CardTitle>
+            <CardDescription className="text-neutral-600 dark:text-white/70">Login to your admin account</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-slate-300">
+                <Label htmlFor="username" className="text-neutral-700 dark:text-white/80">
                   Username
                 </Label>
                 <Input
@@ -98,11 +98,11 @@ export default function LoginPage() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={isLoading}
-                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white placeholder:text-neutral-400"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-300">
+                <Label htmlFor="password" className="text-neutral-700 dark:text-white/80">
                   Password
                 </Label>
                 <Input
@@ -112,7 +112,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
-                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white placeholder:text-neutral-400"
                 />
               </div>
               {error && (
@@ -121,13 +121,13 @@ export default function LoginPage() {
                   <AlertDescription className="text-red-500">{error}</AlertDescription>
                 </Alert>
               )}
-              <Button type="submit" disabled={isLoading} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+              <Button type="submit" disabled={isLoading} className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white">
                 {isLoading ? "Logging in..." : "Login"}
               </Button>
             </form>
-            <div className="mt-4 text-center text-sm text-slate-400">
+            <div className="mt-4 text-center text-sm text-neutral-600 dark:text-white/70">
               Need help?{" "}
-              <Link href="/" className="text-blue-400 hover:text-blue-300">
+              <Link href="/" className="text-[#7a1632] hover:text-[#66122a]">
                 Contact support
               </Link>
             </div>

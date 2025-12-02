@@ -230,62 +230,63 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Admin Management</h1>
-            <p className="text-slate-400 mt-1">Manage system administrators</p>
+            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Admin Management</h1>
+            <p className="text-neutral-600 dark:text-white/70 mt-1">Manage system administrators</p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button className="bg-[#7a1632] hover:bg-[#66122a] text-white">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Admin
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-slate-800 border-slate-700">
+            <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
               <DialogHeader>
-                <DialogTitle className="text-white">Create New Admin</DialogTitle>
-                <DialogDescription className="text-slate-400">Add a new administrator account</DialogDescription>
+                <DialogTitle className="text-neutral-900 dark:text-white">Create New Admin</DialogTitle>
+                <DialogDescription className="text-neutral-600 dark:text-white/70">Add a new administrator account</DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label className="text-slate-300">Username</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">Username</Label>
                   <Input
                     type="text"
                     placeholder="john_doe"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    className="bg-slate-700 border-slate-600 text-white"
+                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                   />
                 </div>
                 <div>
-                  <Label className="text-slate-300">Password</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">Password</Label
+                >
                   <Input
                     type="password"
                     placeholder=""
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="bg-slate-700 border-slate-600 text-white"
+                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                   />
                 </div>
                 <div>
-                  <Label className="text-slate-300">Full Name</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">Full Name</Label>
                   <Input
                     placeholder="John Doe"
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    className="bg-slate-700 border-slate-600 text-white"
+                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                   />
                 </div>
                 <div>
-                  <Label className="text-slate-300">Role</Label>
+                  <Label className="text-neutral-700 dark:text-white/80">Role</Label>
                   <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-700 border-slate-600">
-                      <SelectItem value="store_manager" className="text-white">
+                    <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                      <SelectItem value="store_manager" className="text-neutral-900 dark:text-white">
                         Store Manager
                       </SelectItem>
-                      <SelectItem value="super_admin" className="text-white">
+                      <SelectItem value="super_admin" className="text-neutral-900 dark:text-white">
                         Super Admin
                       </SelectItem>
                     </SelectContent>
@@ -294,7 +295,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                 <Button
                   onClick={handleCreateAdmin}
                   disabled={isLoading}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white"
                 >
                   {isLoading ? "Creating..." : "Create Admin"}
                 </Button>
@@ -305,16 +306,16 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
 
         {/* Metrics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Card className="border-slate-700 bg-slate-800/50">
+          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
             <CardContent className="p-6">
-              <p className="text-slate-400 text-sm">Total Admins</p>
-              <p className="text-3xl font-bold text-white mt-1">{totalAdmins}</p>
+              <p className="text-neutral-600 dark:text-white/70 text-sm">Total Admins</p>
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">{totalAdmins}</p>
             </CardContent>
           </Card>
-          <Card className="border-slate-700 bg-slate-800/50">
+          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
             <CardContent className="p-6">
-              <p className="text-slate-400 text-sm">Active Admins</p>
-              <p className="text-3xl font-bold text-white mt-1">{activeAdmins}</p>
+              <p className="text-neutral-600 dark:text-white/70 text-sm">Active Admins</p>
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">{activeAdmins}</p>
             </CardContent>
           </Card>
         </div>
@@ -322,22 +323,22 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
         {/* Admins List */}
         <div className="grid gap-4">
           {admins?.map((admin: any) => (
-            <Card key={admin.id} className="border-slate-700 bg-slate-800/50 hover:bg-slate-700/50 transition-colors">
+            <Card key={admin.id} className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13] hover:bg-[#7a1632]/5 dark:hover:bg-white/5 transition-colors">
               <CardContent className="p-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-white">{admin.full_name}</h3>
-                      <Badge className={admin.role === "super_admin" ? "bg-purple-600" : "bg-blue-600"}>
+                      <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">{admin.full_name}</h3>
+                      <Badge className={admin.role === "super_admin" ? "bg-purple-600" : "bg-[#7a1632]"}>
                         {admin.role.replace("_", " ")}
                       </Badge>
                       <Badge className={admin.status === "active" ? "bg-green-600" : "bg-red-600"}>
                         {admin.status}
                       </Badge>
                     </div>
-                    <p className="text-slate-400 text-sm">@{admin.username}</p>
+                    <p className="text-neutral-600 dark:text-white/70 text-sm">@{admin.username}</p>
                     {admin.last_login && (
-                      <p className="text-slate-500 text-xs mt-2">
+                      <p className="text-neutral-500 dark:text-white/70 text-xs mt-2">
                         Last login: {new Date(admin.last_login).toLocaleString()}
                       </p>
                     )}
@@ -348,7 +349,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                       size="sm"
                       onClick={() => handleToggleStatus(admin.id, admin.status)}
                       disabled={isLoading || admin.id === user.id}
-                      className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                      className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
                     >
                       {admin.status === "active" ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
                     </Button>
@@ -357,7 +358,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                       size="sm"
                       onClick={() => openEdit(admin)}
                       disabled={isLoading}
-                      className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                      className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
                     >
                       <Edit3 className="w-4 h-4" />
                     </Button>
@@ -366,7 +367,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                       size="sm"
                       onClick={() => openPassword(admin)}
                       disabled={isLoading}
-                      className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                      className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
                     >
                       <KeyRound className="w-4 h-4" />
                     </Button>
@@ -386,9 +387,9 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
           ))}
 
           {!admins || admins.length === 0 ? (
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
               <CardContent className="p-8 text-center">
-                <p className="text-slate-400">No admins found. Use "Add Admin" to create one.</p>
+                <p className="text-neutral-600 dark:text-white/70">No admins found. Use "Add Admin" to create one.</p>
               </CardContent>
             </Card>
           ) : null}
@@ -397,54 +398,54 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
 
       {/* Edit Admin Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="bg-slate-800 border-slate-700">
+        <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
           <DialogHeader>
-            <DialogTitle className="text-white">Edit Admin</DialogTitle>
-            <DialogDescription className="text-slate-400">Update profile, role, or status</DialogDescription>
+            <DialogTitle className="text-neutral-900 dark:text-white">Edit Admin</DialogTitle>
+            <DialogDescription className="text-neutral-600 dark:text-white/70">Update profile, role, or status</DialogDescription>
           </DialogHeader>
           {selectedAdmin ? (
             <div className="space-y-4">
               <div>
-                <Label className="text-slate-300">Full Name</Label>
+                <Label className="text-neutral-700 dark:text-white/80">Full Name</Label>
                 <Input
                   value={editData.full_name}
                   onChange={(e) => setEditData({ ...editData, full_name: e.target.value })}
-                  className="bg-slate-700 border-slate-600 text-white"
+                  className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                 />
               </div>
               <div>
-                <Label className="text-slate-300">Role</Label>
+                <Label className="text-neutral-700 dark:text-white/80">Role</Label>
                 <Select value={editData.role} onValueChange={(value) => setEditData({ ...editData, role: value })}>
-                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                  <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-700 border-slate-600">
-                    <SelectItem value="store_manager" className="text-white">
+                  <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                    <SelectItem value="store_manager" className="text-neutral-900 dark:text-white">
                       Store Manager
                     </SelectItem>
-                    <SelectItem value="super_admin" className="text-white">
+                    <SelectItem value="super_admin" className="text-neutral-900 dark:text-white">
                       Super Admin
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label className="text-slate-300">Status</Label>
+                <Label className="text-neutral-700 dark:text-white/80">Status</Label>
                 <Select value={editData.status} onValueChange={(value) => setEditData({ ...editData, status: value })}>
-                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                  <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-700 border-slate-600">
-                    <SelectItem value="active" className="text-white">
+                  <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                    <SelectItem value="active" className="text-neutral-900 dark:text-white">
                       Active
                     </SelectItem>
-                    <SelectItem value="suspended" className="text-white">
+                    <SelectItem value="suspended" className="text-neutral-900 dark:text-white">
                       Suspended
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleUpdateAdmin} disabled={isLoading} className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button onClick={handleUpdateAdmin} disabled={isLoading} className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white">
                 {isLoading ? "Saving..." : "Save Changes"}
               </Button>
             </div>
@@ -454,22 +455,22 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
 
       {/* Change Password Dialog */}
       <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
-        <DialogContent className="bg-slate-800 border-slate-700">
+        <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
           <DialogHeader>
-            <DialogTitle className="text-white">Change Password</DialogTitle>
-            <DialogDescription className="text-slate-400">Set a new password for this admin</DialogDescription>
+            <DialogTitle className="text-neutral-900 dark:text-white">Change Password</DialogTitle>
+            <DialogDescription className="text-neutral-600 dark:text-white/70">Set a new password for this admin</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label className="text-slate-300">New Password</Label>
+              <Label className="text-neutral-700 dark:text-white/80">New Password</Label>
               <Input
                 type="password"
                 value={passwordValue}
                 onChange={(e) => setPasswordValue(e.target.value)}
-                className="bg-slate-700 border-slate-600 text-white"
+                className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
               />
             </div>
-            <Button onClick={handleChangePassword} disabled={isLoading} className="w-full bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handleChangePassword} disabled={isLoading} className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white">
               {isLoading ? "Updating..." : "Update Password"}
             </Button>
           </div>
@@ -478,16 +479,16 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
 
       {/* Delete Admin Dialog */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent className="bg-slate-800 border-slate-700">
+        <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
           <DialogHeader>
-            <DialogTitle className="text-white">Delete Admin</DialogTitle>
-            <DialogDescription className="text-slate-400">This action cannot be undone</DialogDescription>
+            <DialogTitle className="text-neutral-900 dark:text-white">Delete Admin</DialogTitle>
+            <DialogDescription className="text-neutral-600 dark:text-white/70">This action cannot be undone</DialogDescription>
           </DialogHeader>
           {selectedAdmin ? (
             <div className="space-y-4">
-              <p className="text-slate-300">Are you sure you want to delete @{selectedAdmin.username}?</p>
+              <p className="text-neutral-700 dark:text-white/80">Are you sure you want to delete @{selectedAdmin.username}?</p>
               <div className="flex gap-2">
-                <Button variant="outline" className="border-slate-600" onClick={() => setDeleteOpen(false)}>
+                <Button variant="outline" className="border-[#7a1632]/30" onClick={() => setDeleteOpen(false)}>
                   Cancel
                 </Button>
                 <Button onClick={handleDeleteAdmin} disabled={isLoading} className="bg-red-600 hover:bg-red-700">
