@@ -1,11 +1,13 @@
 "use client"
 import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import Receipt from "../../../../../components/dashboard/receipt"
 
 export default function ReceiptPage({ params }: { params: { id: string } }) {
   const supabase = createClient()
-  const id = params.id
+  const p = useParams() as any
+  const id = String(p?.id || params?.id || "")
   const [transaction, setTransaction] = useState<any | null>(null)
   const [items, setItems] = useState<any[]>([])
   const [admin, setAdmin] = useState<any | null>(null)
@@ -17,6 +19,11 @@ export default function ReceiptPage({ params }: { params: { id: string } }) {
     const run = async () => {
       setLoading(true)
       setError("")
+      if (!id) {
+        setError("Invalid receipt id")
+        setLoading(false)
+        return
+      }
       for (let i = 0; i < 24 && !cancelled; i++) {
         const { data: tx } = await supabase
           .from("transactions")
