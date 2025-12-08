@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     const productIds = Array.from(new Set(items.map((it) => it.product_id)))
     const { data: products, error: prodErr } = await service
       .from("products")
-      .select("id,name,quantity,selling_price")
+      .select("id,name,quantity,selling_price,shop_id")
       .in("id", productIds)
     if (prodErr) return NextResponse.json({ error: prodErr.message }, { status: 500 })
 
@@ -53,13 +53,20 @@ export async function POST(req: Request) {
     }
 
     // Create transaction
+    const uniqueShopIds = Array.from(
+      new Set((items || []).map((it) => String(productMap.get(it.product_id)?.shop_id || ""))).values(),
+    ).filter((sid) => !!sid)
+
+    const txPayload: any = {
+      admin_id: user.id,
+      total_amount: totalAmount,
+      payment_method: paymentMethod,
+    }
+    if (uniqueShopIds.length === 1) txPayload.shop_id = uniqueShopIds[0]
+
     const { data: transaction, error: txErr } = await service
       .from("transactions")
-      .insert({
-        admin_id: user.id,
-        total_amount: totalAmount,
-        payment_method: paymentMethod,
-      })
+      .insert(txPayload)
       .select()
       .maybeSingle()
     if (txErr) return NextResponse.json({ error: txErr.message }, { status: 500 })
@@ -67,13 +74,16 @@ export async function POST(req: Request) {
 
     // Insert items and update stock
     const itemsToInsert = items.map((it) => {
-      const unitPrice = Number(it.price_per_unit || productMap.get(it.product_id)?.selling_price || 0)
+      const p = productMap.get(it.product_id)
+      const unitPrice = Number(it.price_per_unit || p?.selling_price || 0)
       return {
         transaction_id: transaction.id,
         product_id: it.product_id,
+        product_name: p?.name || null,
         quantity: it.quantity,
         price_per_unit: unitPrice,
         total_price: unitPrice * it.quantity,
+        shop_id: p?.shop_id || null,
       }
     })
 

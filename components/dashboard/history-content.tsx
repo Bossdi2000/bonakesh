@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
+import { useRouter } from "next/navigation"
 import DashboardLayout from "./dashboard-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -33,6 +34,7 @@ export default function HistoryContent({ admin, logs, user }: any) {
   const [customerPhone, setCustomerPhone] = useState("")
   const receiptRef = useRef<HTMLDivElement | null>(null)
   const supabase = createClient()
+  const router = useRouter()
 
   const actionTypes = Array.from(
     new Set<string>((logs || []).map((l: any) => String(l.action_type || "")))
@@ -107,11 +109,11 @@ export default function HistoryContent({ admin, logs, user }: any) {
 
       const { data: items, error: itemsErr } = await supabase
         .from("transaction_items")
-        .select("product_id,quantity,price_per_unit,total_price")
+        .select("product_id,product_name,quantity,price_per_unit,total_price")
         .eq("transaction_id", txId)
       if (itemsErr) throw new Error(itemsErr.message)
 
-      const productIds = Array.from(new Set((items || []).map((it: any) => it.product_id)))
+      const productIds = Array.from(new Set((items || []).map((it: any) => it.product_id).filter(Boolean)))
       let namesMap: Record<string, string> = {}
       if (productIds.length > 0) {
         const { data: products, error: prodErr } = await supabase
@@ -124,7 +126,7 @@ export default function HistoryContent({ admin, logs, user }: any) {
 
       const withNames = (items || []).map((it: any) => ({
         product_id: it.product_id,
-        name: namesMap[it.product_id] || "",
+        name: it.product_name || namesMap[it.product_id] || "",
         price_per_unit: Number(it.price_per_unit || 0),
         quantity: Number(it.quantity || 0),
         total_price: Number(it.total_price || 0),
@@ -144,14 +146,13 @@ export default function HistoryContent({ admin, logs, user }: any) {
   }
 
   const handlePrintReceipt = () => {
-    if (!receiptRef.current) return
-    const printWindow = window.open("", "", "width=600,height=800")
-    if (printWindow) {
-      printWindow.document.write(receiptRef.current.innerHTML)
-      printWindow.document.close()
-      printWindow.print()
-      snackbar.info("Receipt ready to print")
+    const id = reprintTransaction?.id
+    if (id) {
+      const url = `/dashboard/checkout/receipt/${id}?print=1`
+      router.push(url)
+      return
     }
+    window.print()
   }
 
   return (
@@ -417,7 +418,7 @@ export default function HistoryContent({ admin, logs, user }: any) {
         </Dialog>
 
         <Dialog open={reprintOpen} onOpenChange={setReprintOpen}>
-          <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30 max-w-2xl">
+          <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30 max-w-2xl max-h-[85vh] overflow-auto">
             <DialogHeader>
               <DialogTitle className="text-neutral-900 dark:text-white">Transaction Receipt</DialogTitle>
               <DialogDescription className="text-neutral-600 dark:text-white/70">Reprint of a completed checkout</DialogDescription>
@@ -434,10 +435,17 @@ export default function HistoryContent({ admin, logs, user }: any) {
                   customerAddress={customerAddress}
                   customerPhone={customerPhone}
                 />
-                <div className="flex justify-center">
+                <div className="flex flex-wrap gap-2 justify-center sticky bottom-0 pt-2">
                   <Button onClick={handlePrintReceipt} className="bg-[#7a1632] hover:bg-[#66122a] text-white">
                     <Printer className="w-4 h-4 mr-2" />
                     Print
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => window.open(`/dashboard/checkout/receipt/${reprintTransaction.id}?print=1`, "_blank")}
+                    className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
+                  >
+                    Open Full Page
                   </Button>
                 </div>
               </div>

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import CheckoutContent from "@/components/dashboard/checkout-content"
 import { getAdminByUserIdServiceRole } from "@/lib/admins/server"
+import { createServiceClient } from "@/lib/supabase/service"
 
 export default async function CheckoutPage() {
   const supabase = await createClient()
@@ -24,6 +25,8 @@ export default async function CheckoutPage() {
   }
 
   const { data: products } = await supabase.from("products").select("*").gt("quantity", 0).order("name")
+  const service = createServiceClient()
+  const { data: shops } = await service.from("shops").select("id,name").order("name")
 
-  return <CheckoutContent admin={admin} products={products || []} user={user} />
+  return <CheckoutContent admin={admin} products={products || []} user={user} shops={shops || []} />
 }

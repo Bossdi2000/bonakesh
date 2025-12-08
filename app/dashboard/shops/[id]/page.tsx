@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { createServiceClient } from "@/lib/supabase/service"
-import ProductsContent from "@/components/dashboard/products-content"
+import ShopDetails from "@/components/dashboard/shop-details"
 import { getAdminByUserIdServiceRole } from "@/lib/admins/server"
 
-export default async function ProductsPage() {
+export default async function ShopDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const supabase = await createClient()
   const {
     data: { user },
@@ -25,12 +26,14 @@ export default async function ProductsPage() {
   }
 
   if (admin.role !== "super_admin") {
-    redirect("/dashboard/checkout")
+    redirect("/dashboard")
   }
 
-  const { data: products } = await supabase.from("products").select("*").order("created_at", { ascending: false })
   const service = createServiceClient()
-  const { data: shops } = await service.from("shops").select("id,name").order("name")
+  const { data: shop } = await service.from("shops").select("*").eq("id", id).maybeSingle()
+  if (!shop) redirect("/dashboard/shops")
 
-  return <ProductsContent admin={admin} products={products || []} user={user} shops={shops || []} />
+  const { data: products } = await service.from("products").select("*").eq("shop_id", id).order("created_at", { ascending: false })
+
+  return <ShopDetails admin={admin} user={user} shop={shop} products={products || []} />
 }

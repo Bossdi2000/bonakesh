@@ -24,15 +24,22 @@ export async function POST(req: Request) {
     const body = await req.json()
     const name = String(body?.name || "").trim()
     const sku = String(body?.sku || "").trim()
+    const serial_number = String(body?.serial_number || "").trim()
+    const model_number = String(body?.model_number || "").trim()
     const buying_price = Number(body?.buying_price)
     const selling_price = Number(body?.selling_price)
     const quantity = Number(body?.quantity)
-    if (!name || !Number.isFinite(buying_price) || !Number.isFinite(selling_price) || !Number.isFinite(quantity)) {
+    const shop_id = String(body?.shop_id || "").trim()
+    if (!name || !Number.isFinite(buying_price) || !Number.isFinite(selling_price) || !Number.isFinite(quantity) || !shop_id) {
       return NextResponse.json({ error: "Invalid product data" }, { status: 400 })
     }
     if (buying_price < 0 || selling_price < 0 || quantity < 0) {
       return NextResponse.json({ error: "Prices and quantity must be non-negative" }, { status: 400 })
     }
+
+    const { data: shop, error: shopErr } = await service.from("shops").select("id").eq("id", shop_id).maybeSingle()
+    if (shopErr) return NextResponse.json({ error: shopErr.message }, { status: 500 })
+    if (!shop) return NextResponse.json({ error: "Shop not found" }, { status: 404 })
 
     if (sku) {
       const { data: existingSku, error: skuErr } = await service
@@ -47,9 +54,12 @@ export async function POST(req: Request) {
     const { error: insertErr } = await service.from("products").insert({
       name,
       sku: sku || null,
+      serial_number: serial_number || null,
+      model_number: model_number || null,
       buying_price,
       selling_price,
       quantity,
+      shop_id,
       created_by: user.id,
     })
     if (insertErr) return NextResponse.json({ error: insertErr.message }, { status: 500 })
@@ -58,7 +68,7 @@ export async function POST(req: Request) {
       admin_id: user.id,
       action_type: "product_created",
       entity_type: "product",
-      details: { name, buying_price, selling_price, quantity },
+      details: { name, sku, serial_number, model_number, buying_price, selling_price, quantity },
     })
 
     return NextResponse.json({ ok: true })

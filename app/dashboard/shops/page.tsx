@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { createServiceClient } from "@/lib/supabase/service"
-import ProductsContent from "@/components/dashboard/products-content"
+import ShopsContent from "@/components/dashboard/shops-content"
 import { getAdminByUserIdServiceRole } from "@/lib/admins/server"
 
-export default async function ProductsPage() {
+export default async function ShopsPage() {
   const supabase = await createClient()
   const {
     data: { user },
@@ -25,12 +25,11 @@ export default async function ProductsPage() {
   }
 
   if (admin.role !== "super_admin") {
-    redirect("/dashboard/checkout")
+    redirect("/dashboard")
   }
 
-  const { data: products } = await supabase.from("products").select("*").order("created_at", { ascending: false })
   const service = createServiceClient()
-  const { data: shops } = await service.from("shops").select("id,name").order("name")
+  const { data: shops } = await service.from("shops").select("*").order("created_at", { ascending: false })
 
-  return <ProductsContent admin={admin} products={products || []} user={user} shops={shops || []} />
+  return <ShopsContent admin={admin} shops={shops || []} user={user} />
 }

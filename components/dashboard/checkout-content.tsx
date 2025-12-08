@@ -22,7 +22,7 @@ interface CartItem {
   total_price: number
 }
 
-export default function CheckoutContent({ admin, products, user }: any) {
+export default function CheckoutContent({ admin, products, user, shops = [] }: any) {
   const [cart, setCart] = useState<CartItem[]>([])
   const [selectedProductId, setSelectedProductId] = useState("")
   const [quantity, setQuantity] = useState("1")
@@ -38,6 +38,11 @@ export default function CheckoutContent({ admin, products, user }: any) {
   const [scanInput, setScanInput] = useState("")
   const [holdsOpen, setHoldsOpen] = useState(false)
   const [holds, setHolds] = useState<any[]>([])
+  const [shopFilter, setShopFilter] = useState<string>("")
+  const [sortByLocation, setSortByLocation] = useState<boolean>(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [selectedVariantId, setSelectedVariantId] = useState<string>("")
+  const [selectedVariantShopId, setSelectedVariantShopId] = useState<string>("")
   const receiptRef = useRef<HTMLDivElement | null>(null)
   const supabase = createClient()
   const router = useRouter()
@@ -75,13 +80,29 @@ export default function CheckoutContent({ admin, products, user }: any) {
     })
   }, [cart, totalAmount, paymentMethod, customerName, customerAddress, customerPhone])
 
+  useEffect(() => {
+    const base = products.find((p: any) => String(p.id) === String(selectedProductId))
+    if (base) {
+      setSelectedVariantId(String(base.id))
+      setSelectedVariantShopId(String(base.shop_id || ""))
+    } else {
+      setSelectedVariantId("")
+      setSelectedVariantShopId("")
+    }
+  }, [selectedProductId, products])
+
   const handleAddToCart = () => {
-    if (!selectedProductId || !quantity || Number.parseInt(quantity) <= 0) {
+    const targetId = selectedVariantId || selectedProductId
+    if (!targetId || !quantity || Number.parseInt(quantity) <= 0) {
       snackbar.error("Select a product and valid quantity")
       return
     }
+    if (selectedVariantShopId && !selectedVariantId) {
+      snackbar.error("Product not available in selected location")
+      return
+    }
 
-    const product = products.find((p: any) => p.id === selectedProductId)
+    const product = products.find((p: any) => String(p.id) === String(targetId))
     if (!product) return
 
     const qty = Number.parseInt(quantity)
@@ -90,7 +111,7 @@ export default function CheckoutContent({ admin, products, user }: any) {
       return
     }
 
-    const existingItem = cart.find((item) => item.product_id === selectedProductId)
+    const existingItem = cart.find((item) => item.product_id === targetId)
     if (existingItem) {
       if (existingItem.quantity + qty > product.quantity) {
         snackbar.error("Insufficient stock available")
@@ -98,11 +119,11 @@ export default function CheckoutContent({ admin, products, user }: any) {
       }
       setCart(
         cart.map((item) =>
-          item.product_id === selectedProductId
+          item.product_id === targetId
             ? {
-                ...item,
-                quantity: item.quantity + qty,
-                total_price: item.price_per_unit * (item.quantity + qty),
+              ...item,
+              quantity: item.quantity + qty,
+              total_price: item.price_per_unit * (item.quantity + qty),
               }
             : item,
         ),
@@ -111,8 +132,8 @@ export default function CheckoutContent({ admin, products, user }: any) {
       setCart([
         ...cart,
         {
-          product_id: selectedProductId,
-          name: product.name,
+          product_id: targetId,
+          name: `${product.name}`,
           price_per_unit: product.selling_price,
           quantity: qty,
           total_price: product.selling_price * qty,
@@ -121,6 +142,7 @@ export default function CheckoutContent({ admin, products, user }: any) {
     }
 
     setSelectedProductId("")
+    setSelectedVariantId("")
     setQuantity("1")
     snackbar.success("Added to cart")
   }
@@ -134,7 +156,9 @@ export default function CheckoutContent({ admin, products, user }: any) {
       snackbar.error("SKU not found")
       return
     }
-    setSelectedProductId(product.id)
+    setSelectedProductId(String(product.id))
+    setSelectedVariantId(String(product.id))
+    setSelectedVariantShopId(String(product.shop_id || ""))
     setQuantity("1")
     setScanInput("")
     setTimeout(() => handleAddToCart(), 0)
@@ -203,7 +227,10 @@ export default function CheckoutContent({ admin, products, user }: any) {
       snackbar.info("Cart is empty")
       return
     }
+    setConfirmOpen(true)
+  }
 
+  const executeCheckout = async () => {
     setIsLoading(true)
     try {
       const items = cart.map((it) => ({
@@ -215,6 +242,7 @@ export default function CheckoutContent({ admin, products, user }: any) {
       const res = await fetch(`/api/checkout/complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           items,
           paymentMethod,
@@ -239,24 +267,32 @@ export default function CheckoutContent({ admin, products, user }: any) {
       setShowReceipt(true)
       setCart([])
       router.refresh()
+      try {
+        const url = `/dashboard/checkout/receipt/${data.transaction_id}?print=1`
+        router.prefetch(url)
+      } catch {}
       snackbar.success("Sale completed")
     } catch (error) {
       snackbar.error("Error completing checkout")
     } finally {
       setIsLoading(false)
+      setConfirmOpen(false)
     }
   }
 
   const handlePrintReceipt = () => {
-    if (receiptRef.current) {
-      const printWindow = window.open("", "", "width=600,height=800")
-      if (printWindow) {
-        printWindow.document.write(receiptRef.current.innerHTML)
-        printWindow.document.close()
-        printWindow.print()
-        snackbar.info("Receipt ready to print")
-      }
+    if (lastTransaction?.id) {
+      const url = `/dashboard/checkout/receipt/${lastTransaction.id}?print=1`
+      router.push(url)
+      return
     }
+    window.print()
+  }
+
+  const getShopName = (productId: string) => {
+    const p = products.find((x: any) => x.id === productId)
+    const s = shops.find((sh: any) => String(sh.id) === String(p?.shop_id || ""))
+    return s?.name || "-"
   }
 
   if (showReceipt && lastTransaction) {
@@ -337,27 +373,23 @@ export default function CheckoutContent({ admin, products, user }: any) {
                   <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search products by name or SKU"
+                    placeholder="Search by name, SKU, model, serial"
                     className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white mt-1"
                   />
                   <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
                     <div className="md:col-span-2">
                       <div className="max-h-64 overflow-auto rounded border border-[#7a1632]/30">
-                        {(searchQuery ? products.filter((p: any) => {
-                          const q = searchQuery.trim().toLowerCase()
-                          const name = String(p.name || "").toLowerCase()
-                          const sku = String(p.sku || "").toLowerCase()
-                          return name.includes(q) || sku.includes(q)
-                        }) : products).slice(0, 50).map((p: any) => (
+                        {getFilteredProducts(products, shops, searchQuery, shopFilter, sortByLocation).slice(0, 50).map((p: any) => (
                           <button
                             key={p.id}
                             type="button"
-                            onClick={() => setSelectedProductId(p.id)}
+                            onClick={() => setSelectedProductId(String(p.id))}
                             className={`flex w-full items-center justify-between px-3 py-2 text-left hover:bg-[#7a1632]/10 dark:hover:bg-white/10 ${selectedProductId === p.id ? "bg-[#7a1632]/10 dark:bg-white/10" : ""}`}
                           >
                             <div>
                               <div className="font-medium text-neutral-900 dark:text-white">{p.name}</div>
-                              <div className="text-xs text-neutral-600 dark:text-white/70">{p.sku || "No SKU"}</div>
+                              <div className="text-xs text-neutral-600 dark:text-white/70">SKU: {p.sku || "-"} • Model: {p.model_number || "-"} • Serial: {p.serial_number || "-"}</div>
+                              <div className="mt-1 text-xs"><span className={`inline-block px-2 py-0.5 rounded ${getLocationBadgeClass(p.shop_id, shops)}`}>{getShopName(p.id)}</span></div>
                             </div>
                             <div className="text-sm text-neutral-700 dark:text-white/80">₦{Number(p.selling_price || 0).toLocaleString("en-NG")}</div>
                             <div className="ml-3 text-xs text-neutral-600 dark:text-white/70">{p.quantity} in stock</div>
@@ -366,6 +398,24 @@ export default function CheckoutContent({ admin, products, user }: any) {
                       </div>
                     </div>
                     <div>
+                      <Label className="text-neutral-700 dark:text-white/80">Filter by Location</Label>
+                      <Select value={shopFilter} onValueChange={(v) => setShopFilter(v === "__ALL__" ? "" : v)}>
+                        <SelectTrigger className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white mt-1">
+                          <SelectValue placeholder="All locations" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-[#1a0d13]">
+                          <SelectItem value="__ALL__">All</SelectItem>
+                          {shops.map((s: any) => (
+                            <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="mt-3">
+                        <Label className="text-neutral-700 dark:text-white/80">Sort by Location</Label>
+                        <Button variant="outline" size="sm" className="mt-1 border-[#7a1632]/30" onClick={() => setSortByLocation((v) => !v)}>
+                          {sortByLocation ? "Location ▾" : "Location ▴"}
+                        </Button>
+                      </div>
                       <Label className="text-neutral-700 dark:text-white/80">Scan SKU</Label>
                       <Input
                         value={scanInput}
@@ -377,7 +427,34 @@ export default function CheckoutContent({ admin, products, user }: any) {
                     </div>
                   </div>
                   {selectedProductId && (
-                    <p className="mt-2 text-xs text-neutral-600 dark:text-white/70">Selected product ready to add</p>
+                    <div className="mt-2 space-y-2">
+                      <p className="text-xs text-neutral-600 dark:text-white/70">Selected product ready to add</p>
+                      <Label className="text-neutral-700 dark:text-white/80">Sell From</Label>
+                      <Select
+                        value={selectedVariantShopId}
+                        onValueChange={(shopId) => {
+                          setSelectedVariantShopId(shopId)
+                          const vid = findVariantInShop(selectedProductId, products, shopId)
+                          if (vid) {
+                            setSelectedVariantId(vid)
+                          } else {
+                            setSelectedVariantId("")
+                            snackbar.error("Product not available at selected location")
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white">
+                          <SelectValue placeholder="Choose location" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-[#1a0d13]">
+                          {shops.map((s: any) => (
+                            <SelectItem key={s.id} value={String(s.id)}>
+                              <span className={`inline-block px-2 py-0.5 rounded ${getLocationBadgeClass(s.id, shops)}`}>{s.name}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   )}
                 </div>
                 <div>
@@ -416,6 +493,7 @@ export default function CheckoutContent({ admin, products, user }: any) {
                       >
                         <div className="flex-1">
                           <p className="text-neutral-900 dark:text-white font-medium">{item.name}</p>
+                          <p className="text-neutral-600 dark:text-white/70 text-xs">{getShopName(item.product_id)}</p>
                           <p className="text-neutral-600 dark:text-white/70 text-sm">
                             {item.quantity} x ₦{item.price_per_unit.toLocaleString("en-NG")}
                           </p>
@@ -585,6 +663,119 @@ export default function CheckoutContent({ admin, products, user }: any) {
           </div>
         </DialogContent>
       </Dialog>
-    </DashboardLayout>
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30 max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="text-neutral-900 dark:text-white">Confirm Checkout</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="border border-[#7a1632]/30 rounded p-3">
+              {cart.map((ci) => (
+                <div key={ci.product_id} className="flex justify-between text-sm">
+                  <span className="text-neutral-700 dark:text-white/80">{ci.name} • {getShopName(ci.product_id)}</span>
+                  <span className="text-neutral-900 dark:text-white">{ci.quantity} × ₦{ci.price_per_unit.toLocaleString("en-NG")} = ₦{ci.total_price.toLocaleString("en-NG")}</span>
+                </div>
+              ))}
+              <div className="mt-2 flex justify-between">
+                <span className="font-medium text-neutral-700 dark:text-white/80">Total</span>
+                <span className="font-bold text-[#7a1632] dark:text-white">₦{totalAmount.toLocaleString("en-NG")}</span>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" className="border-[#7a1632]/30" onClick={() => setConfirmOpen(false)}>Cancel</Button>
+              <Button onClick={executeCheckout} disabled={isLoading} className="bg-[#7a1632] hover:bg-[#66122a] text-white">{isLoading ? "Processing..." : "Confirm"}</Button>
+            </div>
+          </div>
+    </DialogContent>
+  </Dialog>
+  </DashboardLayout>
   )
+}
+
+function norm(s: string) {
+  return s.toLowerCase().replace(/\s+/g, " ").trim()
+}
+
+function score(a: string, b: string) {
+  const A = norm(a), B = norm(b)
+  if (!A || !B) return 0
+  if (A === B) return 100
+  if (A.includes(B)) return 80
+  if (B.includes(A)) return 80
+  let m = 0
+  const setA = new Set(A.split(""))
+  for (const ch of B.split("")) if (setA.has(ch)) m++
+  return Math.round((m / Math.max(A.length, B.length)) * 70)
+}
+
+function getFilteredProducts(products: any[], shops: any[], q: string, shopId: string, sortByLocation: boolean) {
+  const query = norm(q)
+  let res = products
+  if (query) {
+    res = products
+      .map((p) => {
+        const fields = [p.name || "", p.sku || "", p.model_number || "", p.serial_number || ""]
+        const s = Math.max(...fields.map((f) => score(f, query)))
+        return { p, s }
+      })
+      .filter(({ s }) => s >= 40)
+      .sort((a, b) => b.s - a.s)
+      .map(({ p }) => p)
+  }
+  if (shopId) res = res.filter((p) => String(p.shop_id || "") === shopId)
+  if (sortByLocation) {
+    const idx: Record<string, number> = {}
+    shops.forEach((s, i) => (idx[s.id] = i))
+    res = res.slice().sort((a, b) => (idx[a.shop_id || ""] ?? 0) - (idx[b.shop_id || ""] ?? 0))
+  }
+  return res
+}
+
+function getLocationBadgeClass(shopId: string, shops: any[]) {
+  const s = shops.find((x) => x.id === shopId)
+  const name = String(s?.name || "")
+  const isWarehouse = /warehouse|storehouse|depot/i.test(name)
+  return isWarehouse ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"
+}
+
+function getVariantOptions(selectedId: string, products: any[]) {
+  const base = products.find((p: any) => String(p.id) === String(selectedId))
+  if (!base) return []
+  const sku = String(base.sku || "").trim()
+  const model = String(base.model_number || "").trim()
+  const serial = String(base.serial_number || "").trim()
+  if (sku) {
+    return products.filter((p: any) => String(p.sku || "").trim() === sku)
+  }
+  const key = `${String(base.name || "").trim()}|${model}`
+  return products.filter((p: any) => `${String(p.name || "").trim()}|${String(p.model_number || "").trim()}` === key)
+}
+
+function getAvailableShopsForSelected(selectedId: string, products: any[], shops: any[]) {
+  const avail = shops.filter((s: any) => !!findVariantInShop(selectedId, products, String(s.id)))
+  if (avail.length > 0) return avail
+  const baseShopId = String(products.find((p: any) => String(p.id) === String(selectedId))?.shop_id || "")
+  return shops.filter((s: any) => String(s.id) === String(baseShopId))
+}
+
+function findVariantInShop(selectedId: string, products: any[], shopId: string) {
+  const base = products.find((p: any) => String(p.id) === String(selectedId))
+  if (!base) return null
+  const byShop = products.filter((p: any) => String(p.shop_id || "") === String(shopId || ""))
+  const serial = String(base.serial_number || "").trim()
+  if (serial) {
+    const m = byShop.find((p: any) => String(p.serial_number || "").trim() === serial)
+    if (m) return m.id
+  }
+  const sku = String(base.sku || "").trim()
+  if (sku) {
+    const m = byShop.find((p: any) => String(p.sku || "").trim() === sku)
+    if (m) return m.id
+  }
+  const nm = String(base.name || "").trim()
+  const mdl = String(base.model_number || "").trim()
+  const m2 = byShop.find((p: any) => String(p.name || "").trim() === nm && String(p.model_number || "").trim() === mdl)
+  if (m2) return m2.id
+  const m3 = byShop.find((p: any) => String(p.name || "").trim() === nm)
+  return m3 ? m3.id : null
 }

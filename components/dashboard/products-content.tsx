@@ -14,8 +14,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import { Plus, Trash2, Edit2 } from "lucide-react"
+import { Plus, Trash2, Edit2, Eye, EyeOff } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogContent,
@@ -28,7 +29,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import snackbar from "@/lib/ui/snackbar"
 
-export default function ProductsContent({ admin, products, user }: any) {
+export default function ProductsContent({ admin, products, user, shops = [] }: any) {
   const [open, setOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -41,12 +42,40 @@ export default function ProductsContent({ admin, products, user }: any) {
   const [formData, setFormData] = useState({
     name: "",
     sku: "",
+    serial_number: "",
+    model_number: "",
     buying_price: "",
     selling_price: "",
     quantity: "",
   })
+  const [selectedShopId, setSelectedShopId] = useState<string>("")
   const [searchTerm, setSearchTerm] = useState("")
   const router = useRouter()
+
+  const ACCESS_KEY = "marshall-ethel-secret"
+  const [hidden, setHidden] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [accessKey, setAccessKey] = useState("")
+  const formatCurrency = (n: number) => `₦${n.toLocaleString("en-NG")}`
+
+  const handleToggle = () => {
+    if (!hidden) {
+      setHidden(true)
+    } else {
+      setDialogOpen(true)
+    }
+  }
+
+  const handleSubmitKey = () => {
+    if (accessKey.trim() === ACCESS_KEY) {
+      setHidden(false)
+      setDialogOpen(false)
+      setAccessKey("")
+      snackbar.success("Balances visible")
+    } else {
+      snackbar.error("Invalid access key")
+    }
+  }
 
   const handleOpenDialog = (product?: any) => {
     if (product) {
@@ -54,13 +83,17 @@ export default function ProductsContent({ admin, products, user }: any) {
       setFormData({
         name: product.name,
         sku: product.sku || "",
+        serial_number: product.serial_number || "",
+        model_number: product.model_number || "",
         buying_price: product.buying_price,
         selling_price: product.selling_price,
         quantity: product.quantity,
       })
+      setSelectedShopId(product.shop_id || "")
     } else {
       setEditingId(null)
-      setFormData({ name: "", sku: "", buying_price: "", selling_price: "", quantity: "" })
+      setFormData({ name: "", sku: "", serial_number: "", model_number: "", buying_price: "", selling_price: "", quantity: "" })
+      setSelectedShopId("")
     }
     setOpen(true)
   }
@@ -84,6 +117,7 @@ export default function ProductsContent({ admin, products, user }: any) {
       const res = await fetch(`/api/products/${restockProduct.id}/restock`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ addQty }),
       })
       const data = await res.json().catch(() => ({}))
@@ -105,7 +139,7 @@ export default function ProductsContent({ admin, products, user }: any) {
   }
 
   const handleSaveProduct = async () => {
-    if (!formData.name || !formData.buying_price || !formData.selling_price || !formData.quantity) {
+    if (!formData.name || !formData.buying_price || !formData.selling_price || !formData.quantity || !selectedShopId) {
       snackbar.error("Please fill all product fields")
       return
     }
@@ -115,15 +149,19 @@ export default function ProductsContent({ admin, products, user }: any) {
       const payload = {
         name: formData.name,
         sku: String((formData as any).sku || "").trim(),
+        serial_number: String((formData as any).serial_number || "").trim(),
+        model_number: String((formData as any).model_number || "").trim(),
         buying_price: Number.parseFloat(formData.buying_price),
         selling_price: Number.parseFloat(formData.selling_price),
         quantity: Number.parseInt(formData.quantity),
+        shop_id: selectedShopId,
       }
       let res: Response
       if (editingId) {
         res = await fetch(`/api/products/${editingId}/update`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(payload),
         })
         if (!res.ok) {
@@ -135,6 +173,7 @@ export default function ProductsContent({ admin, products, user }: any) {
         res = await fetch(`/api/products/create`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(payload),
         })
         if (!res.ok) {
@@ -145,7 +184,8 @@ export default function ProductsContent({ admin, products, user }: any) {
       }
 
       setOpen(false)
-      setFormData({ name: "", sku: "", buying_price: "", selling_price: "", quantity: "" })
+      setFormData({ name: "", sku: "", serial_number: "", model_number: "", buying_price: "", selling_price: "", quantity: "" })
+      setSelectedShopId("")
       router.refresh()
     } catch (error) {
       console.error("Error saving product:", error)
@@ -162,7 +202,7 @@ export default function ProductsContent({ admin, products, user }: any) {
   const handleDeleteProduct = async (id: string) => {
     setIsLoading(true)
     try {
-      const res = await fetch(`/api/products/${id}/delete`, { method: "POST" })
+      const res = await fetch(`/api/products/${id}/delete`, { method: "POST", credentials: "include" })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err?.error || `Delete failed (${res.status})`)
@@ -202,7 +242,7 @@ export default function ProductsContent({ admin, products, user }: any) {
                 Add New Stock
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
+            <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30 max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-neutral-900 dark:text-white">{editingId ? "Edit Product" : "Add New Product"}</DialogTitle>
                 <DialogDescription className="text-neutral-600 dark:text-white/70">
@@ -228,38 +268,77 @@ export default function ProductsContent({ admin, products, user }: any) {
                     className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
                   />
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-neutral-700 dark:text-white/80">Serial Number</Label>
+                    <Input
+                      placeholder="e.g., SN-12345ABC"
+                      value={(formData as any).serial_number || ""}
+                      onChange={(e) => setFormData({ ...formData, serial_number: e.target.value })}
+                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-neutral-700 dark:text-white/80">Model Number</Label>
+                    <Input
+                      placeholder="e.g., MD-XL-2000"
+                      value={(formData as any).model_number || ""}
+                      onChange={(e) => setFormData({ ...formData, model_number: e.target.value })}
+                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                    />
+                  </div>
+                </div>
                 {/* Computed Previews */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#7a1632]/5 dark:bg-white/5 p-4 rounded-lg">
                   <div>
                     <p className="text-neutral-600 dark:text-white/70 text-sm">Total Bought Value</p>
                     <p className="text-neutral-900 dark:text-white text-lg font-semibold">
-                      ₦{(
-                        (Number.parseFloat(String(formData.buying_price)) || 0) *
-                        (Number.parseInt(String(formData.quantity)) || 0)
-                      ).toLocaleString("en-NG")}
+                      {hidden
+                        ? "₦••••"
+                        : formatCurrency(
+                            (Number.parseFloat(String(formData.buying_price)) || 0) *
+                              (Number.parseInt(String(formData.quantity)) || 0),
+                          )}
                     </p>
                   </div>
                   <div>
                     <p className="text-neutral-600 dark:text-white/70 text-sm">Total Selling Value</p>
                     <p className="text-neutral-900 dark:text-white text-lg font-semibold">
-                      ₦{(
-                        (Number.parseFloat(String(formData.selling_price)) || 0) *
-                        (Number.parseInt(String(formData.quantity)) || 0)
-                      ).toLocaleString("en-NG")}
+                      {hidden
+                        ? "₦••••"
+                        : formatCurrency(
+                            (Number.parseFloat(String(formData.selling_price)) || 0) *
+                              (Number.parseInt(String(formData.quantity)) || 0),
+                          )}
                     </p>
                   </div>
                   <div>
                     <p className="text-neutral-600 dark:text-white/70 text-sm">Expected Profit</p>
                     <p className={`text-lg font-semibold ${((Number.parseFloat(String(formData.selling_price)) || 0) - (Number.parseFloat(String(formData.buying_price)) || 0)) >= 0 ? "text-green-500" : "text-red-500"}`}>
-                      ₦{(
-                        ((Number.parseFloat(String(formData.selling_price)) || 0) -
-                          (Number.parseFloat(String(formData.buying_price)) || 0)) *
-                        (Number.parseInt(String(formData.quantity)) || 0)
-                      ).toLocaleString("en-NG")}
+                      {hidden
+                        ? "₦••••"
+                        : formatCurrency(
+                            ((Number.parseFloat(String(formData.selling_price)) || 0) -
+                              (Number.parseFloat(String(formData.buying_price)) || 0)) *
+                              (Number.parseInt(String(formData.quantity)) || 0),
+                          )}
                     </p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-neutral-700 dark:text-white/80">Shop</Label>
+                    <Select value={selectedShopId} onValueChange={setSelectedShopId}>
+                      <SelectTrigger className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white">
+                        <SelectValue placeholder="Select shop" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white dark:bg-[#1a0d13]">
+                        {shops.map((s: any) => (
+                          <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div>
                     <Label className="text-neutral-700 dark:text-white/80">Buying Price</Label>
                     <Input
@@ -313,6 +392,12 @@ export default function ProductsContent({ admin, products, user }: any) {
           </Dialog>
         </div>
 
+        <div className="flex justify-end">
+          <Button variant="ghost" size="icon" onClick={handleToggle} className="text-[#7a1632] dark:text-white">
+            {hidden ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </Button>
+        </div>
+
         {/* Summary Cards */}
         <div className="grid md:grid-cols-3 gap-4">
           <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
@@ -324,14 +409,14 @@ export default function ProductsContent({ admin, products, user }: any) {
           <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
             <CardContent className="p-6">
               <p className="text-neutral-600 dark:text-white/70 text-sm mb-1">Total Bought Value</p>
-              <p className="text-3xl font-bold text-neutral-900 dark:text-white">₦{totalBoughtValue.toLocaleString("en-NG")}</p>
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white">{hidden ? "₦••••" : formatCurrency(totalBoughtValue)}</p>
             </CardContent>
           </Card>
           <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
             <CardContent className="p-6">
               <p className="text-neutral-600 dark:text-white/70 text-sm mb-1">Expected Profit</p>
               <p className={`text-3xl font-bold ${expectedProfit >= 0 ? "text-green-500" : "text-red-500"}`}>
-                ₦{expectedProfit.toLocaleString("en-NG")}
+                {hidden ? "₦••••" : formatCurrency(expectedProfit)}
               </p>
             </CardContent>
           </Card>
@@ -374,14 +459,14 @@ export default function ProductsContent({ admin, products, user }: any) {
                       >
                         <td className="py-3 px-4 text-neutral-900 dark:text-white">{product.name}</td>
                         <td className="text-right py-3 px-4 text-neutral-700 dark:text-white/80">
-                          ₦{product.buying_price.toLocaleString("en-NG")}
+                          {hidden ? "₦••••" : formatCurrency(product.buying_price)}
                         </td>
                         <td className="text-right py-3 px-4 text-neutral-700 dark:text-white/80">
-                          ₦{product.selling_price.toLocaleString("en-NG")}
+                          {hidden ? "₦••••" : formatCurrency(product.selling_price)}
                         </td>
                         <td className="text-right py-3 px-4 text-neutral-700 dark:text-white/80">{product.quantity}</td>
                         <td className="text-right py-3 px-4 text-green-500 font-semibold">
-                          ₦{(product.selling_price * product.quantity).toLocaleString("en-NG")}
+                          {hidden ? "₦••••" : formatCurrency(product.selling_price * product.quantity)}
                         </td>
                         <td className="text-right py-3 px-4">
                           <div className="flex justify-end gap-2">
@@ -432,6 +517,21 @@ export default function ProductsContent({ admin, products, user }: any) {
         </Card>
       </div>
       {/* Restock Modal */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enter Access Key</DialogTitle>
+            <DialogDescription>Enter the access key to show balances</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Input type="password" value={accessKey} onChange={(e) => setAccessKey(e.target.value)} placeholder="Access key" />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleSubmitKey}>Submit</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       <RestockDialog
         open={restockOpen}
         onOpenChange={setRestockOpen}
@@ -475,7 +575,7 @@ export default function ProductsContent({ admin, products, user }: any) {
 export function RestockDialog({ open, onOpenChange, qty, setQty, product, onConfirm, loading, error }: any) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
+      <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30 max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-neutral-900 dark:text-white">Restock Product</DialogTitle>
           <DialogDescription className="text-neutral-600 dark:text-white/70">

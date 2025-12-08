@@ -28,6 +28,9 @@ export async function POST(
     const body = await req.json()
     const name = body?.name ? String(body.name).trim() : undefined
     const sku = body?.sku !== undefined ? String(body.sku).trim() : undefined
+    const serial_number = body?.serial_number !== undefined ? String(body.serial_number).trim() : undefined
+    const model_number = body?.model_number !== undefined ? String(body.model_number).trim() : undefined
+    const shop_id = body?.shop_id !== undefined ? String(body.shop_id).trim() : undefined
     const buying_price = body?.buying_price !== undefined ? Number(body.buying_price) : undefined
     const selling_price = body?.selling_price !== undefined ? Number(body.selling_price) : undefined
     const quantity = body?.quantity !== undefined ? Number(body.quantity) : undefined
@@ -35,6 +38,9 @@ export async function POST(
     const update: Record<string, any> = {}
     if (name !== undefined) update.name = name
     if (sku !== undefined) update.sku = sku || null
+    if (serial_number !== undefined) update.serial_number = serial_number || null
+    if (model_number !== undefined) update.model_number = model_number || null
+    if (shop_id !== undefined) update.shop_id = shop_id || null
     if (buying_price !== undefined) {
       if (!Number.isFinite(buying_price) || buying_price < 0) return NextResponse.json({ error: "Invalid buying price" }, { status: 400 })
       update.buying_price = buying_price
@@ -48,6 +54,12 @@ export async function POST(
       update.quantity = quantity
     }
     if (Object.keys(update).length === 0) return NextResponse.json({ error: "No valid fields to update" }, { status: 400 })
+
+    if (shop_id !== undefined && shop_id) {
+      const { data: shop, error: shopErr } = await service.from("shops").select("id").eq("id", shop_id).maybeSingle()
+      if (shopErr) return NextResponse.json({ error: shopErr.message }, { status: 500 })
+      if (!shop) return NextResponse.json({ error: "Shop not found" }, { status: 404 })
+    }
 
     if (sku !== undefined && sku) {
       const { data: existingSku, error: skuErr } = await service

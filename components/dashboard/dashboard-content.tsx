@@ -1,7 +1,13 @@
 "use client"
 
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import DashboardLayout from "./dashboard-layout"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Eye, EyeOff } from "lucide-react"
+import snackbar from "@/lib/ui/snackbar"
 
 type Stats = {
   totalStockValue: number
@@ -25,12 +31,43 @@ type RecentTx = {
 }
 
 export default function DashboardContent({ user, admin, stats, recentTransactions }: { user: any; admin: any; stats: Stats; recentTransactions: RecentTx[] }) {
+  const ACCESS_KEY = "marshall-ethel-secret"
+  const [hidden, setHidden] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [accessKey, setAccessKey] = useState("")
+
+  const formatCurrency = (n: number) => `₦${n.toLocaleString("en-NG")}`
+
+  const handleToggle = () => {
+    if (!hidden) {
+      setHidden(true)
+    } else {
+      setDialogOpen(true)
+    }
+  }
+
+  const handleSubmit = () => {
+    if (accessKey.trim() === ACCESS_KEY) {
+      setHidden(false)
+      setDialogOpen(false)
+      setAccessKey("")
+      snackbar.success("Balances visible")
+    } else {
+      snackbar.error("Invalid access key")
+    }
+  }
   return (
     <DashboardLayout admin={admin} user={user}>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">Dashboard Overview</h2>
           <p className="text-neutral-600 dark:text-white/70">Key stats and recent activity</p>
+        </div>
+
+        <div className="flex justify-end mb-3">
+          <Button variant="ghost" size="icon" onClick={handleToggle} className="text-[#7a1632] dark:text-white">
+            {hidden ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </Button>
         </div>
 
         {/* Summary Cards */}
@@ -41,7 +78,7 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
               <CardDescription className="text-neutral-600 dark:text-white/70">Combined selling value of all items</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-[#7a1632] dark:text-white">₦{stats.totalStockValue.toLocaleString("en-NG")}</p>
+              <p className="text-3xl font-bold text-[#7a1632] dark:text-white">{hidden ? "₦••••" : formatCurrency(stats.totalStockValue)}</p>
             </CardContent>
           </Card>
           <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
@@ -50,7 +87,7 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
               <CardDescription className="text-neutral-600 dark:text-white/70">Combined cost price of all items</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-neutral-900 dark:text-white">₦{stats.totalBoughtPrice.toLocaleString("en-NG")}</p>
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white">{hidden ? "₦••••" : formatCurrency(stats.totalBoughtPrice)}</p>
             </CardContent>
           </Card>
           <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
@@ -59,7 +96,7 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
               <CardDescription className="text-neutral-600 dark:text-white/70">All-time revenue from completed transactions</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-[#7a1632] dark:text-white">₦{stats.totalSellingPrice.toLocaleString("en-NG")}</p>
+              <p className="text-3xl font-bold text-[#7a1632] dark:text-white">{hidden ? "₦••••" : formatCurrency(stats.totalSellingPrice)}</p>
             </CardContent>
           </Card>
           <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
@@ -69,7 +106,7 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
             </CardHeader>
             <CardContent>
               <p className={"text-3xl font-bold " + (stats.totalExpectedProfit >= 0 ? "text-[#7a1632] dark:text-white" : "text-red-500")}> 
-                ₦{stats.totalExpectedProfit.toLocaleString("en-NG")}
+                {hidden ? "₦••••" : formatCurrency(stats.totalExpectedProfit)}
               </p>
             </CardContent>
           </Card>
@@ -79,10 +116,26 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
               <CardDescription className="text-neutral-600 dark:text-white/70">Count of completed sales</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-neutral-900 dark:text-white">{stats.totalTransactions.toLocaleString("en-NG")}</p>
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white">{hidden ? "••••" : stats.totalTransactions.toLocaleString("en-NG")}</p>
             </CardContent>
           </Card>
         </div>
+
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Enter Access Key</DialogTitle>
+              <DialogDescription>Enter the access key to show balances</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <Input type="password" value={accessKey} onChange={(e) => setAccessKey(e.target.value)} placeholder="Access key" />
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleSubmit}>Submit</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Recent Transactions */}
         <div className="mt-8">

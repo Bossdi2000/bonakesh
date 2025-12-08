@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { BarChart3, Package, ShoppingCart, Users, History, Settings, LogOut, Menu, X, Moon, Sun, Eye } from "lucide-react"
+import { BarChart3, Package, ShoppingCart, Users, History, Settings, LogOut, Menu, X, Moon, Sun, Eye, Building2 } from "lucide-react"
 import { useTheme } from "@/hooks/use-theme"
 
 export default function DashboardLayout({ admin, user, children }: any) {
@@ -34,6 +34,7 @@ export default function DashboardLayout({ admin, user, children }: any) {
       ? [
           { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
           { href: "/dashboard/products", label: "Stock", icon: Package },
+          { href: "/dashboard/shops", label: "Manage Shops", icon: Building2 },
           { href: "/dashboard/checkout", label: "Checkout", icon: ShoppingCart },
           { href: "/dashboard/checkout/view", label: "Customer View", icon: Eye },
           { href: "/dashboard/staff", label: "Staff", icon: Users },

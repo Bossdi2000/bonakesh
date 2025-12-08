@@ -23,11 +23,14 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    const supabase = createClient()
     setIsLoading(true)
     setError(null)
 
     try {
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        throw new Error("Authentication service not configured")
+      }
+      const supabase = createClient()
       // Derive email from username (seeded users use temp emails)
       const uname = username.trim()
       const candidates = [
