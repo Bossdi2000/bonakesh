@@ -20,6 +20,8 @@ interface CartItem {
   price_per_unit: number
   quantity: number
   total_price: number
+  serial_no?: string
+  model_no?: string
 }
 
 export default function CheckoutContent({ admin, products, user, shops = [] }: any) {
@@ -137,6 +139,8 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
           price_per_unit: product.selling_price,
           quantity: qty,
           total_price: product.selling_price * qty,
+          serial_no: String(product.serial_number || ""),
+          model_no: String(product.model_number || ""),
         },
       ])
     }
@@ -263,7 +267,15 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
         .maybeSingle()
 
       setLastTransaction(txRecord || { id: data.transaction_id, total_amount: totalAmount, payment_method: paymentMethod, transaction_date: new Date().toISOString() })
-      setReceiptItems(cart)
+      const enriched = cart.map((it) => {
+        const p = products.find((pr: any) => String(pr.id) === String(it.product_id))
+        return {
+          ...it,
+          serial_no: String(p?.serial_number || it.serial_no || ""),
+          model_no: String(p?.model_number || it.model_no || ""),
+        }
+      })
+      setReceiptItems(enriched)
       setShowReceipt(true)
       setCart([])
       router.refresh()

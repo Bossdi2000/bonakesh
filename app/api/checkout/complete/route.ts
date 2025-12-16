@@ -121,6 +121,13 @@ export async function POST(req: Request) {
       }
     }
 
+    // Resolve admin full name for log continuity
+    let adminName: string | null = null
+    try {
+      const { data: adm } = await service.from("admins").select("id, full_name").eq("id", user.id).maybeSingle()
+      adminName = adm?.full_name || null
+    } catch {}
+
     await service.from("activity_log").insert({
       admin_id: user.id,
       action_type: "transaction_completed",
@@ -133,6 +140,7 @@ export async function POST(req: Request) {
         customer_name: customer?.name,
         customer_address: customer?.address,
         customer_phone: customer?.phone,
+        admin_name: adminName,
         price_overrides: overrides,
       },
     })
