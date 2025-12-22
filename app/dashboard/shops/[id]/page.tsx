@@ -6,6 +6,7 @@ import { getAdminByUserIdServiceRole } from "@/lib/admins/server"
 
 export default async function ShopDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  console.log("Accessing Shop Page ID:", id)
   const supabase = await createClient()
   const {
     data: { user },
@@ -30,8 +31,13 @@ export default async function ShopDetailPage({ params }: { params: Promise<{ id:
   }
 
   const service = createServiceClient()
-  const { data: shop } = await service.from("shops").select("*").eq("id", id).maybeSingle()
-  if (!shop) redirect("/dashboard/shops")
+  console.log("Fetching shop with service client:", id)
+  const { data: shop, error: shopError } = await service.from("shops").select("*").eq("id", id).maybeSingle()
+  if (shopError) console.error("Shop fetch error:", shopError)
+  if (!shop) {
+    console.log("Shop not found, redirecting...")
+    redirect("/dashboard/shops")
+  }
 
   const { data: products } = await service.from("products").select("*").eq("shop_id", id).order("created_at", { ascending: false })
 

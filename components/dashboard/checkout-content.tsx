@@ -62,7 +62,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
     return () => {
       try {
         channel.unsubscribe()
-      } catch {}
+      } catch { }
     }
   }, [admin?.id])
 
@@ -126,7 +126,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
               ...item,
               quantity: item.quantity + qty,
               total_price: item.price_per_unit * (item.quantity + qty),
-              }
+            }
             : item,
         ),
       )
@@ -173,14 +173,14 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
     try {
       const raw = localStorage.getItem(holdKey)
       setHolds(raw ? JSON.parse(raw) : [])
-    } catch {}
+    } catch { }
   }, [holdKey])
 
   const saveHolds = (next: any[]) => {
     try {
       localStorage.setItem(holdKey, JSON.stringify(next))
       setHolds(next)
-    } catch {}
+    } catch { }
   }
 
   const handleHoldCart = () => {
@@ -271,8 +271,8 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
         const p = products.find((pr: any) => String(pr.id) === String(it.product_id))
         return {
           ...it,
-          serial_no: String(p?.serial_number || it.serial_no || ""),
-          model_no: String(p?.model_number || it.model_no || ""),
+          serial_no: String(it.serial_no || p?.serial_number || ""),
+          model_no: String(it.model_no || p?.model_number || ""),
         }
       })
       setReceiptItems(enriched)
@@ -282,7 +282,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
       try {
         const url = `/dashboard/checkout/receipt/${data.transaction_id}?print=1`
         router.prefetch(url)
-      } catch {}
+      } catch { }
       snackbar.success("Sale completed")
     } catch (error) {
       snackbar.error("Error completing checkout")
@@ -351,7 +351,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
   return (
     <DashboardLayout admin={admin} user={user}>
       <div className="space-y-6">
-          <div>
+        <div>
           <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Checkout</h1>
           <p className="text-neutral-600 dark:text-white/70 mt-1">Process customer sales</p>
           <div className="mt-2">
@@ -509,21 +509,53 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                           <p className="text-neutral-600 dark:text-white/70 text-sm">
                             {item.quantity} x ₦{item.price_per_unit.toLocaleString("en-NG")}
                           </p>
-                          <div className="mt-2 flex items-center gap-2">
-                            <Label className="text-neutral-700 dark:text-white/80 text-xs">Override price</Label>
-                            <Input
-                              type="number"
-                              value={item.price_per_unit}
-                              onChange={(e) => {
-                                const val = Number(e.target.value)
-                                setCart((prev) => prev.map((ci) => (
-                                  ci.product_id === item.product_id
-                                    ? { ...ci, price_per_unit: val, total_price: val * ci.quantity }
-                                    : ci
-                                )))
-                              }}
-                              className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white w-28 h-8"
-                            />
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              <Label className="text-neutral-700 dark:text-white/80 text-xs text-nowrap">Price</Label>
+                              <Input
+                                type="number"
+                                value={item.price_per_unit}
+                                onChange={(e) => {
+                                  const val = Number(e.target.value)
+                                  setCart((prev) => prev.map((ci) => (
+                                    ci.product_id === item.product_id
+                                      ? { ...ci, price_per_unit: val, total_price: val * ci.quantity }
+                                      : ci
+                                  )))
+                                }}
+                                className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white w-24 h-7 text-xs px-2"
+                              />
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Label className="text-neutral-700 dark:text-white/80 text-xs text-nowrap">MN</Label>
+                              <Input
+                                value={item.model_no || ""}
+                                onChange={(e) => {
+                                  setCart((prev) => prev.map((ci) => (
+                                    ci.product_id === item.product_id
+                                      ? { ...ci, model_no: e.target.value }
+                                      : ci
+                                  )))
+                                }}
+                                placeholder="Model No"
+                                className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white w-24 h-7 text-xs px-2"
+                              />
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Label className="text-neutral-700 dark:text-white/80 text-xs text-nowrap">SN</Label>
+                              <Input
+                                value={item.serial_no || ""}
+                                onChange={(e) => {
+                                  setCart((prev) => prev.map((ci) => (
+                                    ci.product_id === item.product_id
+                                      ? { ...ci, serial_no: e.target.value }
+                                      : ci
+                                  )))
+                                }}
+                                placeholder="Serial No"
+                                className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white w-24 h-7 text-xs px-2"
+                              />
+                            </div>
                           </div>
                         </div>
                         <div className="text-right">
@@ -663,7 +695,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                 <div key={h.id} className="flex items-center justify-between border border-[#7a1632]/30 rounded p-3">
                   <div className="text-sm">
                     <div className="text-neutral-900 dark:text-white font-medium">{h.customer?.name || "Unnamed"}</div>
-                    <div className="text-neutral-600 dark:text-white/70">{new Date(h.created_at).toLocaleString()} • {h.cart.length} item(s) • ₦{Number(h.totalAmount||0).toLocaleString("en-NG")}</div>
+                    <div className="text-neutral-600 dark:text-white/70">{new Date(h.created_at).toLocaleString()} • {h.cart.length} item(s) • ₦{Number(h.totalAmount || 0).toLocaleString("en-NG")}</div>
                   </div>
                   <div className="flex gap-2">
                     <Button variant="outline" className="border-[#7a1632]/30" onClick={() => resumeHold(h.id)}>Resume</Button>
@@ -698,9 +730,9 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
               <Button onClick={executeCheckout} disabled={isLoading} className="bg-[#7a1632] hover:bg-[#66122a] text-white">{isLoading ? "Processing..." : "Confirm"}</Button>
             </div>
           </div>
-    </DialogContent>
-  </Dialog>
-  </DashboardLayout>
+        </DialogContent>
+      </Dialog>
+    </DashboardLayout>
   )
 }
 
