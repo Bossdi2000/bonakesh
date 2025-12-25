@@ -74,7 +74,25 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
             <CardHeader>
-              <CardTitle className="text-neutral-900 dark:text-white">Revenue</CardTitle>
+              <CardTitle className="text-neutral-900 dark:text-white">Total Stock Value</CardTitle>
+              <CardDescription className="text-neutral-600 dark:text-white/70">Combined selling value of all items</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold text-[#7a1632] dark:text-white">{hidden ? "₦••••" : formatCurrency(stats.totalStockValue)}</p>
+            </CardContent>
+          </Card>
+          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <CardHeader>
+              <CardTitle className="text-neutral-900 dark:text-white">Total Bought Price</CardTitle>
+              <CardDescription className="text-neutral-600 dark:text-white/70">Combined cost price of all items</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold text-neutral-900 dark:text-white">{hidden ? "₦••••" : formatCurrency(stats.totalBoughtPrice)}</p>
+            </CardContent>
+          </Card>
+          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <CardHeader>
+              <CardTitle className="text-neutral-900 dark:text-white">Total Sales Revenue</CardTitle>
               <CardDescription className="text-neutral-600 dark:text-white/70">All-time revenue from completed transactions</CardDescription>
             </CardHeader>
             <CardContent>
@@ -83,7 +101,18 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
           </Card>
           <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
             <CardHeader>
-              <CardTitle className="text-neutral-900 dark:text-white">Delivered</CardTitle>
+              <CardTitle className="text-neutral-900 dark:text-white">Total Expected Profit</CardTitle>
+              <CardDescription className="text-neutral-600 dark:text-white/70">Selling − Buying (current stock)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className={"text-3xl font-bold " + (stats.totalExpectedProfit >= 0 ? "text-[#7a1632] dark:text-white" : "text-red-500")}> 
+                {hidden ? "₦••••" : formatCurrency(stats.totalExpectedProfit)}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <CardHeader>
+              <CardTitle className="text-neutral-900 dark:text-white">Total Transactions</CardTitle>
               <CardDescription className="text-neutral-600 dark:text-white/70">Count of completed sales</CardDescription>
             </CardHeader>
             <CardContent>
