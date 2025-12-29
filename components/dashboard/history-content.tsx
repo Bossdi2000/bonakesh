@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import DashboardLayout from "./dashboard-layout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,11 +13,14 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Skeleton } from "@/components/ui/skeleton"
 import { createClient } from "@/lib/supabase/client"
 import Receipt from "./receipt"
-import { Printer } from "lucide-react"
+import { Printer, Loader2, LayoutGrid, ShoppingCart, Package, ShieldCheck } from "lucide-react"
 import { snackbar } from "@/lib/ui/snackbar"
 
-export default function HistoryContent({ admin, logs, user }: any) {
+export default function HistoryContent({ admin, logs: initialLogs, user }: any) {
   const [searchTerm, setSearchTerm] = useState("")
+  const [logs, setLogs] = useState(initialLogs || [])
+  const [isSearching, setIsSearching] = useState(false)
+  const [isRemoteResults, setIsRemoteResults] = useState(false)
   const [actionType, setActionType] = useState("all")
   const [adminName, setAdminName] = useState("all")
   const [startDate, setStartDate] = useState<string>("")
@@ -35,6 +38,38 @@ export default function HistoryContent({ admin, logs, user }: any) {
   const receiptRef = useRef<HTMLDivElement | null>(null)
   const supabase = createClient()
   const router = useRouter()
+
+  const [category, setCategory] = useState("all")
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (!searchTerm && category === "all") {
+        setLogs(initialLogs || [])
+        setIsRemoteResults(false)
+        return
+      }
+
+      setIsSearching(true)
+      try {
+        const params = new URLSearchParams()
+        if (searchTerm) params.set("q", searchTerm)
+        if (category !== "all") params.set("category", category)
+
+        const res = await fetch(`/api/history/search?${params.toString()}`)
+        const json = await res.json()
+        if (json.data) {
+          setLogs(json.data)
+          setIsRemoteResults(true)
+        }
+      } catch (e) {
+        console.error(e)
+        snackbar.error("Failed to search history")
+      } finally {
+        setIsSearching(false)
+      }
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [searchTerm, category, initialLogs])
 
   const actionTypes = Array.from(
     new Set<string>((logs || []).map((l: any) => String(l.action_type || "")))
@@ -72,6 +107,7 @@ export default function HistoryContent({ admin, logs, user }: any) {
 
   const filteredLogs = logs.filter((log: any) => {
     const matchesSearch =
+      isRemoteResults ||
       log.action_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (log.entity_type?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (getAffectedItem(log).toLowerCase() || "").includes(searchTerm.toLowerCase())
@@ -161,6 +197,41 @@ export default function HistoryContent({ admin, logs, user }: any) {
         <div>
           <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Activity Log</h1>
           <p className="text-neutral-600 dark:text-white/70 mt-1">Complete history of all system actions</p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={category === "all" ? "default" : "outline"}
+            onClick={() => setCategory("all")}
+            className="gap-2"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            All Activity
+          </Button>
+          <Button
+            variant={category === "checkouts" ? "default" : "outline"}
+            onClick={() => setCategory("checkouts")}
+            className="gap-2"
+          >
+            <ShoppingCart className="h-4 w-4" />
+            Checkouts
+          </Button>
+          <Button
+            variant={category === "inventory" ? "default" : "outline"}
+            onClick={() => setCategory("inventory")}
+            className="gap-2"
+          >
+            <Package className="h-4 w-4" />
+            Inventory
+          </Button>
+          <Button
+            variant={category === "auth" ? "default" : "outline"}
+            onClick={() => setCategory("auth")}
+            className="gap-2"
+          >
+            <ShieldCheck className="h-4 w-4" />
+            System & Auth
+          </Button>
         </div>
 
         <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">

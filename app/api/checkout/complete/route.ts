@@ -23,7 +23,8 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
-    const items: Array<{ product_id: string; quantity: number; price_per_unit: number }> = body?.items || []
+    const items: Array<{ product_id: string; quantity: number; price_per_unit: number; serial_no?: string; model_no?: string }> =
+      body?.items || []
     const paymentMethod: string = String(body?.paymentMethod || "cash")
     const customer: { name?: string; address?: string; phone?: string } = body?.customer || {}
 
@@ -113,12 +114,20 @@ export async function POST(req: Request) {
 
     // Activity log with price overrides if any
     const overrides: any[] = []
+    const logItems: any[] = []
     for (const it of items) {
       const p = productMap.get(it.product_id)
       const unitPrice = Number(it.price_per_unit || p?.selling_price || 0)
       if (p && Number(p.selling_price) !== unitPrice) {
         overrides.push({ product_id: it.product_id, name: p.name, original: Number(p.selling_price), overridden: unitPrice, quantity: it.quantity })
       }
+      logItems.push({
+        name: p?.name,
+        serial_no: it.serial_no,
+        model_no: it.model_no,
+        quantity: it.quantity,
+        price: unitPrice,
+      })
     }
 
     // Resolve admin full name for log continuity
@@ -127,6 +136,18 @@ export async function POST(req: Request) {
       const { data: adm } = await service.from("admins").select("id, full_name").eq("id", user.id).maybeSingle()
       adminName = adm?.full_name || null
     } catch {}
+
+    const searchText = [
+      customer?.name,
+      customer?.phone,
+      transaction.id,
+      adminName,
+      paymentMethod,
+      ...logItems.map((i) => `${i.name} ${i.serial_no || ""} ${i.model_no || ""}`),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
 
     await service.from("activity_log").insert({
       admin_id: user.id,
@@ -142,6 +163,8 @@ export async function POST(req: Request) {
         customer_phone: customer?.phone,
         admin_name: adminName,
         price_overrides: overrides,
+        items: logItems,
+        search_text: searchText,
       },
     })
 

@@ -117,6 +117,14 @@ export default function LoginPage() {
                   disabled={isLoading}
                   className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white placeholder:text-neutral-400"
                 />
+                <div className="flex justify-end">
+                  <Link 
+                    href="/password/reset" 
+                    className="text-xs text-[#7a1632] hover:text-[#66122a] font-medium"
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
               </div>
               {error && (
                 <Alert className="border-red-500/50 bg-red-500/10">

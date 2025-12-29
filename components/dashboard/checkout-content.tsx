@@ -15,6 +15,7 @@ import Receipt from "./receipt"
 import { snackbar } from "@/lib/ui/snackbar"
 
 interface CartItem {
+  id: string
   product_id: string
   name: string
   price_per_unit: number
@@ -113,37 +114,28 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
       return
     }
 
-    const existingItem = cart.find((item) => item.product_id === targetId)
-    if (existingItem) {
-      if (existingItem.quantity + qty > product.quantity) {
-        snackbar.error("Insufficient stock available")
-        return
-      }
-      setCart(
-        cart.map((item) =>
-          item.product_id === targetId
-            ? {
-              ...item,
-              quantity: item.quantity + qty,
-              total_price: item.price_per_unit * (item.quantity + qty),
-            }
-            : item,
-        ),
-      )
-    } else {
-      setCart([
-        ...cart,
-        {
-          product_id: targetId,
-          name: `${product.name}`,
-          price_per_unit: product.selling_price,
-          quantity: qty,
-          total_price: product.selling_price * qty,
-          serial_no: String(product.serial_number || ""),
-          model_no: String(product.model_number || ""),
-        },
-      ])
-    }
+    const defaultSerial = String(product.serial_number || "")
+    
+    // Always create new item unless explicitly aggregating logic is requested or needed.
+    // Per user request: "if I select same product for the second time and adds to cart, it should be a new product"
+    // "as long as I didnt specify quanty before adding to cart, then that item must appear as new item"
+    // However, if user types quantity > 1, we add that as one line item with quantity > 1.
+    // If they add again, we create ANOTHER line item.
+    // So we NEVER aggregate into existing items anymore.
+    
+    setCart([
+      ...cart,
+      {
+        id: crypto.randomUUID(),
+        product_id: targetId,
+        name: `${product.name}`,
+        price_per_unit: product.selling_price,
+        quantity: qty,
+        total_price: product.selling_price * qty,
+        serial_no: defaultSerial,
+        model_no: String(product.model_number || ""),
+      },
+    ])
 
     setSelectedProductId("")
     setSelectedVariantId("")
@@ -220,8 +212,8 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
     saveHolds(next)
   }
 
-  const handleRemoveFromCart = (productId: string) => {
-    setCart(cart.filter((item) => item.product_id !== productId))
+  const handleRemoveFromCart = (cartId: string) => {
+    setCart(cart.filter((item) => item.id !== cartId))
   }
 
   // moved above for correct hook dependency evaluation
@@ -500,7 +492,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                   <div className="space-y-3">
                     {cart.map((item) => (
                       <div
-                        key={item.product_id}
+                        key={item.id}
                         className="flex items-center justify-between p-3 bg-[#7a1632]/5 dark:bg-white/5 rounded-lg"
                       >
                         <div className="flex-1">
@@ -518,7 +510,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                                 onChange={(e) => {
                                   const val = Number(e.target.value)
                                   setCart((prev) => prev.map((ci) => (
-                                    ci.product_id === item.product_id
+                                    ci.id === item.id
                                       ? { ...ci, price_per_unit: val, total_price: val * ci.quantity }
                                       : ci
                                   )))
@@ -532,7 +524,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                                 value={item.model_no || ""}
                                 onChange={(e) => {
                                   setCart((prev) => prev.map((ci) => (
-                                    ci.product_id === item.product_id
+                                    ci.id === item.id
                                       ? { ...ci, model_no: e.target.value }
                                       : ci
                                   )))
@@ -547,7 +539,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                                 value={item.serial_no || ""}
                                 onChange={(e) => {
                                   setCart((prev) => prev.map((ci) => (
-                                    ci.product_id === item.product_id
+                                    ci.id === item.id
                                       ? { ...ci, serial_no: e.target.value }
                                       : ci
                                   )))
@@ -563,7 +555,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleRemoveFromCart(item.product_id)}
+                            onClick={() => handleRemoveFromCart(item.id)}
                             className="border-red-600 text-red-500 hover:bg-red-600/10 mt-1"
                           >
                             <Trash2 className="w-4 h-4" />
