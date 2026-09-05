@@ -30,6 +30,9 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
     full_name: "",
     role: "store_manager",
   })
+  const [codesOpen, setCodesOpen] = useState(false)
+  const [codesTitle, setCodesTitle] = useState("")
+  const [codes, setCodes] = useState<string[]>([])
   const supabase = createClient()
   const router = useRouter()
 
@@ -70,6 +73,14 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
       setOpen(false)
       router.refresh()
       snackbar.success("Admin created")
+
+      // Store-manager accounts get 5 one-time login codes — surface them so the
+      // super admin can copy and hand them over.
+      if (data.tokenCodes && data.tokenCodes.length > 0) {
+        setCodesTitle(`Login codes for ${formData.username}`)
+        setCodes(data.tokenCodes)
+        setCodesOpen(true)
+      }
     } catch (error) {
       console.error("Error creating admin:", error)
       snackbar.error("Error creating admin")
@@ -225,6 +236,49 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
     }
   }
 
+  const openCodes = async (admin: any) => {
+    setSelectedAdmin(admin)
+    setIsLoading(true)
+    try {
+      const res = await fetch(`/api/admins/${admin.id}/codes`)
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.error || "Failed to load codes")
+      const remaining = (data.codes || []).filter((c: any) => !c.used_at).map((c: any) => c.code)
+      setCodesTitle(`Login codes for ${admin.username}`)
+      setCodes(remaining)
+      setCodesOpen(true)
+    } catch (error: any) {
+      snackbar.error(error?.message || "Failed to load codes")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleRegenerateCodes = async () => {
+    if (!selectedAdmin) return
+    setIsLoading(true)
+    try {
+      const res = await fetch(`/api/admins/${selectedAdmin.id}/codes/regenerate`, { method: "POST" })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.error || "Failed to regenerate codes")
+      setCodes(data.tokenCodes)
+      snackbar.success("5 new codes generated")
+    } catch (error: any) {
+      snackbar.error(error?.message || "Failed to regenerate codes")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const copyCodes = async () => {
+    try {
+      await navigator.clipboard.writeText(codes.join("\n"))
+      snackbar.success("Codes copied to clipboard")
+    } catch {
+      snackbar.error("Could not copy codes")
+    }
+  }
+
   return (
     <DashboardLayout admin={currentAdmin} user={user}>
       <div className="space-y-6">
@@ -235,12 +289,12 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-[#7a1632] hover:bg-[#66122a] text-white">
+              <Button className="bg-[#0ea5e9] hover:bg-[#0284c7] text-white">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Admin
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
+            <DialogContent className="border-[#0ea5e9]/30">
               <DialogHeader>
                 <DialogTitle className="text-neutral-900 dark:text-white">Create New Admin</DialogTitle>
                 <DialogDescription className="text-neutral-600 dark:text-white/70">Add a new administrator account</DialogDescription>
@@ -253,7 +307,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                     placeholder="john_doe"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                    className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                   />
                 </div>
                 <div>
@@ -264,7 +318,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                     placeholder=""
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                    className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                   />
                 </div>
                 <div>
@@ -273,16 +327,16 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                     placeholder="John Doe"
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                    className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                   />
                 </div>
                 <div>
                   <Label className="text-neutral-700 dark:text-white/80">Role</Label>
                   <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                    <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
+                    <SelectTrigger className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30 text-neutral-900 dark:text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                    <SelectContent className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30">
                       <SelectItem value="store_manager" className="text-neutral-900 dark:text-white">
                         Store Manager
                       </SelectItem>
@@ -295,7 +349,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                 <Button
                   onClick={handleCreateAdmin}
                   disabled={isLoading}
-                  className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white"
+                  className="w-full bg-[#0ea5e9] hover:bg-[#0284c7] text-white"
                 >
                   {isLoading ? "Creating..." : "Create Admin"}
                 </Button>
@@ -306,13 +360,13 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
 
         {/* Metrics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardContent className="p-6">
               <p className="text-neutral-600 dark:text-white/70 text-sm">Total Admins</p>
               <p className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">{totalAdmins}</p>
             </CardContent>
           </Card>
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardContent className="p-6">
               <p className="text-neutral-600 dark:text-white/70 text-sm">Active Admins</p>
               <p className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">{activeAdmins}</p>
@@ -323,13 +377,13 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
         {/* Admins List */}
         <div className="grid gap-4">
           {admins?.map((admin: any) => (
-            <Card key={admin.id} className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13] hover:bg-[#7a1632]/5 dark:hover:bg-white/5 transition-colors">
+            <Card key={admin.id} className="border-[#0ea5e9]/30 hover:bg-[#0ea5e9]/5 dark:hover:bg-white/5 transition-colors">
               <CardContent className="p-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">{admin.full_name}</h3>
-                      <Badge className={admin.role === "super_admin" ? "bg-purple-600" : "bg-[#7a1632]"}>
+                      <Badge className={admin.role === "super_admin" ? "bg-purple-600" : "bg-[#0ea5e9]"}>
                         {admin.role.replace("_", " ")}
                       </Badge>
                       <Badge className={admin.status === "active" ? "bg-green-600" : "bg-red-600"}>
@@ -349,7 +403,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                       size="sm"
                       onClick={() => handleToggleStatus(admin.id, admin.status)}
                       disabled={isLoading || admin.id === user.id}
-                      className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
+                      className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"
                     >
                       {admin.status === "active" ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
                     </Button>
@@ -358,7 +412,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                       size="sm"
                       onClick={() => openEdit(admin)}
                       disabled={isLoading}
-                      className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
+                      className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"
                     >
                       <Edit3 className="w-4 h-4" />
                     </Button>
@@ -367,10 +421,23 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                       size="sm"
                       onClick={() => openPassword(admin)}
                       disabled={isLoading}
-                      className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
+                      className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"
                     >
                       <KeyRound className="w-4 h-4" />
                     </Button>
+                    {admin.role !== "super_admin" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openCodes(admin)}
+                        disabled={isLoading}
+                        title="View / regenerate login codes"
+                        className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"
+                      >
+                        <KeyRound className="w-4 h-4" />
+                        <span className="ml-1 text-xs hidden sm:inline">Codes</span>
+                      </Button>
+                    )}
                     <Button
                       variant="destructive"
                       size="sm"
@@ -387,7 +454,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
           ))}
 
           {!admins || admins.length === 0 ? (
-            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <Card className="border-[#0ea5e9]/30 ">
               <CardContent className="p-8 text-center">
                 <p className="text-neutral-600 dark:text-white/70">No admins found. Use "Add Admin" to create one.</p>
               </CardContent>
@@ -398,7 +465,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
 
       {/* Edit Admin Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
+        <DialogContent className="border-[#0ea5e9]/30">
           <DialogHeader>
             <DialogTitle className="text-neutral-900 dark:text-white">Edit Admin</DialogTitle>
             <DialogDescription className="text-neutral-600 dark:text-white/70">Update profile, role, or status</DialogDescription>
@@ -410,16 +477,16 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                 <Input
                   value={editData.full_name}
                   onChange={(e) => setEditData({ ...editData, full_name: e.target.value })}
-                  className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                  className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                 />
               </div>
               <div>
                 <Label className="text-neutral-700 dark:text-white/80">Role</Label>
                 <Select value={editData.role} onValueChange={(value) => setEditData({ ...editData, role: value })}>
-                  <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
+                  <SelectTrigger className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30 text-neutral-900 dark:text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                  <SelectContent className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30">
                     <SelectItem value="store_manager" className="text-neutral-900 dark:text-white">
                       Store Manager
                     </SelectItem>
@@ -432,10 +499,10 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
               <div>
                 <Label className="text-neutral-700 dark:text-white/80">Status</Label>
                 <Select value={editData.status} onValueChange={(value) => setEditData({ ...editData, status: value })}>
-                  <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
+                  <SelectTrigger className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30 text-neutral-900 dark:text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                  <SelectContent className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30">
                     <SelectItem value="active" className="text-neutral-900 dark:text-white">
                       Active
                     </SelectItem>
@@ -445,7 +512,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleUpdateAdmin} disabled={isLoading} className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white">
+              <Button onClick={handleUpdateAdmin} disabled={isLoading} className="w-full bg-[#0ea5e9] hover:bg-[#0284c7] text-white">
                 {isLoading ? "Saving..." : "Save Changes"}
               </Button>
             </div>
@@ -455,7 +522,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
 
       {/* Change Password Dialog */}
       <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
-        <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
+        <DialogContent className="border-[#0ea5e9]/30">
           <DialogHeader>
             <DialogTitle className="text-neutral-900 dark:text-white">Change Password</DialogTitle>
             <DialogDescription className="text-neutral-600 dark:text-white/70">Set a new password for this admin</DialogDescription>
@@ -467,10 +534,10 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
                 type="password"
                 value={passwordValue}
                 onChange={(e) => setPasswordValue(e.target.value)}
-                className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
               />
             </div>
-            <Button onClick={handleChangePassword} disabled={isLoading} className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white">
+            <Button onClick={handleChangePassword} disabled={isLoading} className="w-full bg-[#0ea5e9] hover:bg-[#0284c7] text-white">
               {isLoading ? "Updating..." : "Update Password"}
             </Button>
           </div>
@@ -479,7 +546,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
 
       {/* Delete Admin Dialog */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
+        <DialogContent className="border-[#0ea5e9]/30">
           <DialogHeader>
             <DialogTitle className="text-neutral-900 dark:text-white">Delete Admin</DialogTitle>
             <DialogDescription className="text-neutral-600 dark:text-white/70">This action cannot be undone</DialogDescription>
@@ -488,7 +555,7 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
             <div className="space-y-4">
               <p className="text-neutral-700 dark:text-white/80">Are you sure you want to delete @{selectedAdmin.username}?</p>
               <div className="flex gap-2">
-                <Button variant="outline" className="border-[#7a1632]/30" onClick={() => setDeleteOpen(false)}>
+                <Button variant="outline" className="border-[#0ea5e9]/30" onClick={() => setDeleteOpen(false)}>
                   Cancel
                 </Button>
                 <Button onClick={handleDeleteAdmin} disabled={isLoading} className="bg-red-600 hover:bg-red-700">
@@ -497,6 +564,79 @@ export default function AdminManagementContent({ currentAdmin, admins, user }: a
               </div>
             </div>
           ) : null}
+        </DialogContent>
+      </Dialog>
+
+      {/* Token Codes Dialog */}
+      <Dialog open={codesOpen} onOpenChange={setCodesOpen}>
+        <DialogContent className="border-[#0ea5e9]/30">
+          <DialogHeader>
+            <DialogTitle className="text-neutral-900 dark:text-white">{codesTitle}</DialogTitle>
+            <DialogDescription className="text-neutral-600 dark:text-white/70">
+              One-time login codes for this store manager. Each code can be used once — hand them over alongside the
+              username and password.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            {codes.length > 0 ? (
+              <div className="grid gap-2">
+                {codes.map((code, idx) => (
+                  <div
+                    key={code}
+                    className="flex items-center justify-between rounded-lg border border-[#0ea5e9]/30 bg-[#0ea5e9]/5 dark:bg-white/5 px-4 py-2"
+                  >
+                    <span className="font-mono text-lg tracking-wider text-neutral-900 dark:text-white">
+                      {idx + 1}. {code}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-[#0ea5e9] dark:text-sky-300"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(code)
+                          snackbar.success("Code copied")
+                        } catch {
+                          snackbar.error("Could not copy")
+                        }
+                      }}
+                    >
+                      Copy
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-neutral-600 dark:text-white/70 text-sm">
+                No unused codes remaining. Generate a fresh set below.
+              </p>
+            )}
+            <div className="flex flex-wrap justify-end gap-2 pt-2">
+              <Button variant="outline" className="border-[#0ea5e9]/30" onClick={() => setCodesOpen(false)}>
+                Close
+              </Button>
+              <Button
+                variant="outline"
+                className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80"
+                onClick={copyCodes}
+                disabled={codes.length === 0}
+              >
+                Copy All
+              </Button>
+              <Button
+                onClick={handleRegenerateCodes}
+                disabled={isLoading}
+                className="bg-[#0ea5e9] hover:bg-[#0284c7] text-white"
+              >
+                {isLoading ? "Generating..." : "Generate New Codes"}
+              </Button>
+            </div>
+            {selectedAdmin?.role !== "super_admin" && codes.length === 0 && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                All 5 codes have been used. Generate new codes to let this manager log in again.
+              </p>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </DashboardLayout>

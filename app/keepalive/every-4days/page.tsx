@@ -126,7 +126,7 @@ export default function KeepAlivePage() {
         <div className="min-h-screen bg-slate-50 dark:bg-[#0f0b0c] p-6 flex flex-col items-center justify-center font-sans">
             <div className="w-full max-w-2xl space-y-6">
                 <div className="text-center space-y-2">
-                    <h1 className="text-3xl font-bold text-[#7a1632] dark:text-white flex items-center justify-center gap-3">
+                    <h1 className="text-3xl font-bold text-[#0ea5e9] dark:text-white flex items-center justify-center gap-3">
                         <Activity className="w-8 h-8" />
                         Database Keep-Alive
                     </h1>
@@ -138,7 +138,7 @@ export default function KeepAlivePage() {
                     </p>
                 </div>
 
-                <Card className="border-[#7a1632]/20 shadow-lg bg-white dark:bg-[#1a0d13]">
+                <Card className="border-[#0ea5e9]/20 shadow-lg ">
                     <CardContent className="p-8">
                         <div className="flex flex-col items-center space-y-8">
 
@@ -148,7 +148,7 @@ export default function KeepAlivePage() {
                                     <circle
                                         cx="50%" cy="50%" r="46%"
                                         fill="transparent"
-                                        stroke="#7a1632"
+                                        stroke="#0ea5e9"
                                         strokeWidth="8"
                                         strokeDasharray="289%" // Approx circum
                                         strokeDashoffset={`${289 - (289 * getProgress() / 100)}%`}
@@ -171,7 +171,7 @@ export default function KeepAlivePage() {
                             {/* Controls */}
                             <div className="flex flex-col items-center gap-4 w-full">
                                 {status === "pinging" ? (
-                                    <div className="flex items-center gap-2 text-[#7a1632] animate-pulse font-medium">
+                                    <div className="flex items-center gap-2 text-[#0ea5e9] animate-pulse font-medium">
                                         <RefreshCw className="w-5 h-5 animate-spin" />
                                         Pinging database...
                                     </div>
@@ -179,7 +179,7 @@ export default function KeepAlivePage() {
                                     <Button
                                         size="lg"
                                         onClick={handlePing}
-                                        className="bg-[#7a1632] hover:bg-[#66122a] text-white px-8 rounded-full shadow-md transition-transform hover:scale-105"
+                                        className="bg-[#0ea5e9] hover:bg-[#0284c7] text-white px-8 rounded-full shadow-md transition-transform hover:scale-105"
                                     >
                                         <RefreshCw className="w-4 h-4 mr-2" />
                                         Ping Now
@@ -211,7 +211,7 @@ export default function KeepAlivePage() {
                 </Card>
 
                 {/* Logs */}
-                <Card className="border-[#7a1632]/20 shadow-sm bg-white dark:bg-[#1a0d13]">
+                <Card className="border-[#0ea5e9]/20 shadow-sm ">
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm uppercase tracking-widest text-slate-500">Activity Log</CardTitle>
                     </CardHeader>

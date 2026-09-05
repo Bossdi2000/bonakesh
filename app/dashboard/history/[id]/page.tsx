@@ -1,16 +1,11 @@
 import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
 import { createServiceClient } from "@/lib/supabase/service"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { requireAdmin } from "@/lib/admins/require-admin"
 
 export default async function HistoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-  if (authError || !user) redirect("/auth/login")
+  await requireAdmin()
 
   const service = createServiceClient()
   const { data: log } = await service
@@ -28,7 +23,7 @@ export default async function HistoryDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="p-6">
-      <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+      <Card className="border-[#0ea5e9]/30 ">
         <CardHeader>
           <CardTitle className="text-neutral-900 dark:text-white">Activity Details</CardTitle>
         </CardHeader>
@@ -40,7 +35,7 @@ export default async function HistoryDetailPage({ params }: { params: Promise<{ 
           <div><span>At:</span> {new Date(log.created_at).toLocaleString()}</div>
           <div className="mt-2">
             <span>Details:</span>
-            <pre className="mt-1 whitespace-pre-wrap break-words bg-[#7a1632]/5 dark:bg-white/5 p-3 rounded text-neutral-900 dark:text-white text-xs">{JSON.stringify(log.details || {}, null, 2)}</pre>
+            <pre className="mt-1 whitespace-pre-wrap break-words bg-[#0ea5e9]/5 dark:bg-white/5 p-3 rounded text-neutral-900 dark:text-white text-xs">{JSON.stringify(log.details || {}, null, 2)}</pre>
           </div>
         </CardContent>
       </Card>

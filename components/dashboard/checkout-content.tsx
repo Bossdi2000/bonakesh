@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Plus, Trash2, Printer, CheckCircle } from "lucide-react"
-import Receipt from "./receipt"
+import Invoice from "./invoice"
 import { snackbar } from "@/lib/ui/snackbar"
 
 interface CartItem {
@@ -308,19 +308,23 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
             <p className="text-neutral-600 dark:text-white/70 mt-1">Order completed successfully</p>
           </div>
 
-          <Receipt
+          <Invoice
             ref={receiptRef}
-            transaction={lastTransaction}
-            items={receiptItems}
-            admin={admin}
-            user={user}
-            customerName={customerName}
-            customerAddress={customerAddress}
-            customerPhone={customerPhone}
+            invoiceNo={String(lastTransaction.id).slice(0, 6).toUpperCase()}
+            date={lastTransaction.transaction_date || lastTransaction.created_at}
+            customer={{ name: customerName, address: customerAddress, phone: customerPhone }}
+            items={receiptItems.map((it) => ({
+              qty: it.quantity,
+              description: it.name,
+              mn: it.model_no,
+              sn: it.serial_no,
+              rate: it.price_per_unit,
+            }))}
+            total={Number(lastTransaction.total_amount)}
           />
 
           <div className="flex gap-3 justify-center">
-            <Button onClick={handlePrintReceipt} className="bg-[#7a1632] hover:bg-[#66122a] text-white">
+            <Button onClick={handlePrintReceipt} className="bg-[#0ea5e9] hover:bg-[#0284c7] text-white">
               <Printer className="w-4 h-4 mr-2" />
               Print
             </Button>
@@ -330,7 +334,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                 setCart([])
               }}
               variant="outline"
-              className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
+              className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"
             >
               New Transaction
             </Button>
@@ -350,14 +354,14 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
             <Button
               variant="outline"
               onClick={() => window.open(`/dashboard/checkout/view?admin=${admin?.id}`, "customer_view", "width=480,height=800")}
-              className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
+              className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"
             >
               Open Customer View
             </Button>
             <Button
               variant="outline"
               onClick={() => setHoldsOpen(true)}
-              className="ml-2 border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
+              className="ml-2 border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"
             >
               View Holds
             </Button>
@@ -367,7 +371,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Add Products */}
           <div className="lg:col-span-2 space-y-4">
-            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <Card className="border-[#0ea5e9]/30 ">
               <CardHeader>
                 <CardTitle className="text-neutral-900 dark:text-white">Add Products</CardTitle>
               </CardHeader>
@@ -378,17 +382,17 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by name, SKU, model, serial"
-                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white mt-1"
+                    className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white mt-1"
                   />
                   <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
                     <div className="md:col-span-2">
-                      <div className="max-h-64 overflow-auto rounded border border-[#7a1632]/30">
+                      <div className="max-h-64 overflow-auto rounded border border-[#0ea5e9]/30">
                         {getFilteredProducts(products, shops, searchQuery, shopFilter, sortByLocation).slice(0, 50).map((p: any) => (
                           <button
                             key={p.id}
                             type="button"
                             onClick={() => setSelectedProductId(String(p.id))}
-                            className={`flex w-full items-center justify-between px-3 py-2 text-left hover:bg-[#7a1632]/10 dark:hover:bg-white/10 ${selectedProductId === p.id ? "bg-[#7a1632]/10 dark:bg-white/10" : ""}`}
+                            className={`flex w-full items-center justify-between px-3 py-2 text-left hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10 ${selectedProductId === p.id ? "bg-[#0ea5e9]/10 dark:bg-white/10" : ""}`}
                           >
                             <div>
                               <div className="font-medium text-neutral-900 dark:text-white">{p.name}</div>
@@ -404,10 +408,10 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                     <div>
                       <Label className="text-neutral-700 dark:text-white/80">Filter by Location</Label>
                       <Select value={shopFilter} onValueChange={(v) => setShopFilter(v === "__ALL__" ? "" : v)}>
-                        <SelectTrigger className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white mt-1">
+                        <SelectTrigger className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white mt-1">
                           <SelectValue placeholder="All locations" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white dark:bg-[#1a0d13]">
+                        <SelectContent className="">
                           <SelectItem value="__ALL__">All</SelectItem>
                           {shops.map((s: any) => (
                             <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
@@ -416,7 +420,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                       </Select>
                       <div className="mt-3">
                         <Label className="text-neutral-700 dark:text-white/80">Sort by Location</Label>
-                        <Button variant="outline" size="sm" className="mt-1 border-[#7a1632]/30" onClick={() => setSortByLocation((v) => !v)}>
+                        <Button variant="outline" size="sm" className="mt-1 border-[#0ea5e9]/30" onClick={() => setSortByLocation((v) => !v)}>
                           {sortByLocation ? "Location ▾" : "Location ▴"}
                         </Button>
                       </div>
@@ -426,7 +430,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                         onChange={(e) => setScanInput(e.target.value)}
                         onKeyDown={handleScanEnter}
                         placeholder="Focus and scan barcode/SKU"
-                        className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white mt-1"
+                        className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white mt-1"
                       />
                     </div>
                   </div>
@@ -447,10 +451,10 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                           }
                         }}
                       >
-                        <SelectTrigger className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white">
+                        <SelectTrigger className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white">
                           <SelectValue placeholder="Choose location" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white dark:bg-[#1a0d13]">
+                        <SelectContent className="">
                           {shops.map((s: any) => (
                             <SelectItem key={s.id} value={String(s.id)}>
                               <span className={`inline-block px-2 py-0.5 rounded ${getLocationBadgeClass(s.id, shops)}`}>{s.name}</span>
@@ -468,13 +472,13 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                     min="1"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
-                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                    className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                   />
                 </div>
                 <Button
                   onClick={handleAddToCart}
                   disabled={isLoading || !selectedProductId}
-                  className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white"
+                  className="w-full bg-[#0ea5e9] hover:bg-[#0284c7] text-white"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add to Cart
@@ -483,7 +487,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
             </Card>
 
             {/* Cart Items */}
-            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <Card className="border-[#0ea5e9]/30 ">
               <CardHeader>
                 <CardTitle className="text-neutral-900 dark:text-white">Cart Items</CardTitle>
               </CardHeader>
@@ -493,7 +497,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                     {cart.map((item) => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between p-3 bg-[#7a1632]/5 dark:bg-white/5 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-[#0ea5e9]/5 dark:bg-white/5 rounded-lg"
                       >
                         <div className="flex-1">
                           <p className="text-neutral-900 dark:text-white font-medium">{item.name}</p>
@@ -515,7 +519,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                                       : ci
                                   )))
                                 }}
-                                className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white w-24 h-7 text-xs px-2"
+                                className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white w-24 h-7 text-xs px-2"
                               />
                             </div>
                             <div className="flex items-center gap-1">
@@ -530,7 +534,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                                   )))
                                 }}
                                 placeholder="Model No"
-                                className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white w-24 h-7 text-xs px-2"
+                                className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white w-24 h-7 text-xs px-2"
                               />
                             </div>
                             <div className="flex items-center gap-1">
@@ -545,7 +549,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                                   )))
                                 }}
                                 placeholder="Serial No"
-                                className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white w-24 h-7 text-xs px-2"
+                                className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white w-24 h-7 text-xs px-2"
                               />
                             </div>
                           </div>
@@ -573,19 +577,19 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
 
           {/* Summary & Checkout */}
           <div className="space-y-4">
-            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <Card className="border-[#0ea5e9]/30 ">
               <CardHeader>
                 <CardTitle className="text-neutral-900 dark:text-white">Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2 border-b border-[#7a1632]/30 pb-4">
+                <div className="space-y-2 border-b border-[#0ea5e9]/30 pb-4">
                   <div className="flex justify-between text-neutral-700 dark:text-white/80">
                     <span>Items:</span>
                     <span>{cart.length}</span>
                   </div>
                   <div className="flex justify-between text-neutral-700 dark:text-white/80">
                     <span>Total Amount:</span>
-                    <span className="text-lg font-bold text-[#7a1632] dark:text-white">₦{totalAmount.toLocaleString("en-NG")}</span>
+                    <span className="text-lg font-bold text-[#0ea5e9] dark:text-white">₦{totalAmount.toLocaleString("en-NG")}</span>
                   </div>
                 </div>
 
@@ -597,7 +601,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       placeholder="Full name"
-                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                      className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                     />
                   </div>
                   <div>
@@ -606,7 +610,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                       value={customerAddress}
                       onChange={(e) => setCustomerAddress(e.target.value)}
                       placeholder="Address"
-                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                      className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                     />
                   </div>
                   <div>
@@ -615,7 +619,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
                       placeholder="e.g. 08012345678"
-                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                      className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                     />
                   </div>
                 </div>
@@ -623,10 +627,10 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                 <div>
                   <Label className="text-neutral-700 dark:text-white/80">Payment Method</Label>
                   <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                    <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
+                    <SelectTrigger className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30 text-neutral-900 dark:text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                    <SelectContent className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30">
                       <SelectItem value="cash" className="text-neutral-900 dark:text-white">
                         Cash
                       </SelectItem>
@@ -648,14 +652,14 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                     variant="outline"
                     onClick={handleHoldCart}
                     disabled={isLoading || cart.length === 0}
-                    className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10 w-1/2"
+                    className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10 w-1/2"
                   >
                     Hold Cart
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => setHoldsOpen(true)}
-                    className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10 w-1/2"
+                    className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10 w-1/2"
                   >
                     Resume Holds
                   </Button>
@@ -664,7 +668,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
                 <Button
                   onClick={handleCompleteCheckout}
                   disabled={isLoading || cart.length === 0}
-                  className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white"
+                  className="w-full bg-[#0ea5e9] hover:bg-[#0284c7] text-white"
                 >
                   <CheckCircle className="w-4 h-4 mr-2" />
                   Complete Sale
@@ -675,7 +679,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
         </div>
       </div>
       <Dialog open={holdsOpen} onOpenChange={setHoldsOpen}>
-        <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30 max-w-2xl">
+        <DialogContent className="border-[#0ea5e9]/30 max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-neutral-900 dark:text-white">Held Carts</DialogTitle>
           </DialogHeader>
@@ -684,13 +688,13 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
               <p className="text-neutral-600 dark:text-white/70">No held carts</p>
             ) : (
               holds.map((h) => (
-                <div key={h.id} className="flex items-center justify-between border border-[#7a1632]/30 rounded p-3">
+                <div key={h.id} className="flex items-center justify-between border border-[#0ea5e9]/30 rounded p-3">
                   <div className="text-sm">
                     <div className="text-neutral-900 dark:text-white font-medium">{h.customer?.name || "Unnamed"}</div>
                     <div className="text-neutral-600 dark:text-white/70">{new Date(h.created_at).toLocaleString()} • {h.cart.length} item(s) • ₦{Number(h.totalAmount || 0).toLocaleString("en-NG")}</div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" className="border-[#7a1632]/30" onClick={() => resumeHold(h.id)}>Resume</Button>
+                    <Button variant="outline" className="border-[#0ea5e9]/30" onClick={() => resumeHold(h.id)}>Resume</Button>
                     <Button variant="outline" className="border-red-600 text-red-500" onClick={() => deleteHold(h.id)}>Delete</Button>
                   </div>
                 </div>
@@ -700,12 +704,12 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
         </DialogContent>
       </Dialog>
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30 max-w-xl">
+        <DialogContent className="border-[#0ea5e9]/30 max-w-xl">
           <DialogHeader>
             <DialogTitle className="text-neutral-900 dark:text-white">Confirm Checkout</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <div className="border border-[#7a1632]/30 rounded p-3">
+            <div className="border border-[#0ea5e9]/30 rounded p-3">
               {cart.map((ci) => (
                 <div key={ci.product_id} className="flex justify-between text-sm">
                   <span className="text-neutral-700 dark:text-white/80">{ci.name} • {getShopName(ci.product_id)}</span>
@@ -714,12 +718,12 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
               ))}
               <div className="mt-2 flex justify-between">
                 <span className="font-medium text-neutral-700 dark:text-white/80">Total</span>
-                <span className="font-bold text-[#7a1632] dark:text-white">₦{totalAmount.toLocaleString("en-NG")}</span>
+                <span className="font-bold text-[#0ea5e9] dark:text-white">₦{totalAmount.toLocaleString("en-NG")}</span>
               </div>
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" className="border-[#7a1632]/30" onClick={() => setConfirmOpen(false)}>Cancel</Button>
-              <Button onClick={executeCheckout} disabled={isLoading} className="bg-[#7a1632] hover:bg-[#66122a] text-white">{isLoading ? "Processing..." : "Confirm"}</Button>
+              <Button variant="outline" className="border-[#0ea5e9]/30" onClick={() => setConfirmOpen(false)}>Cancel</Button>
+              <Button onClick={executeCheckout} disabled={isLoading} className="bg-[#0ea5e9] hover:bg-[#0284c7] text-white">{isLoading ? "Processing..." : "Confirm"}</Button>
             </div>
           </div>
         </DialogContent>

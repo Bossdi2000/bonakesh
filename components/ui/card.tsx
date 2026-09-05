@@ -7,7 +7,11 @@ function Card({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="card"
       className={cn(
-        'bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm',
+        'text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm',
+        // Glassmorphism + soft cyan glow by default; use .dark to flip to the dark glass surface.
+        'glass-panel dark:glass-panel-dark glow-sky dark:glow-sky',
+        // Optional shimmering highlight along the top edge.
+        '[&_.card-shine]:block relative overflow-hidden',
         className,
       )}
       {...props}

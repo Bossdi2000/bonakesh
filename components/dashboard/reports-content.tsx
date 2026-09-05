@@ -149,20 +149,20 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
           </TabsList>
         </Tabs>
         <div className="flex gap-2 ml-4">
-          <Button variant="outline" className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10" onClick={() => window.print()}>Print</Button>
-          <Button className="bg-[#7a1632] hover:bg-[#66122a] text-white" onClick={exportPdf}>Export PDF</Button>
+          <Button variant="outline" className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10" onClick={() => window.print()}>Print</Button>
+          <Button className="bg-[#0ea5e9] hover:bg-[#0284c7] text-white" onClick={exportPdf}>Export PDF</Button>
         </div>
       </div>
 
-      <Card className="mb-6 border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+      <Card className="mb-6 border-[#0ea5e9]/30 ">
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
           <div>
             <Label className="text-neutral-700 dark:text-white/80">Payment Method</Label>
             <Select value={method || "all"} onValueChange={onMethodChange}>
-              <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white mt-1">
+              <SelectTrigger className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30 text-neutral-900 dark:text-white mt-1">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+              <SelectContent className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30">
                 <SelectItem value="all" className="text-white">All</SelectItem>
                 <SelectItem value="cash" className="text-white">Cash</SelectItem>
                 <SelectItem value="transfer" className="text-white">Bank Transfer</SelectItem>
@@ -174,10 +174,10 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
           <div>
             <Label className="text-neutral-700 dark:text-white/80">Admin</Label>
             <Select value={adminFilter || "all"} onValueChange={onAdminChange}>
-              <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white mt-1">
+              <SelectTrigger className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30 text-neutral-900 dark:text-white mt-1">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 max-h-64 overflow-auto">
+              <SelectContent className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30 max-h-64 overflow-auto">
                 <SelectItem value="all" className="text-white">All</SelectItem>
                 {(admins || []).map((a: any) => (
                   <SelectItem key={a.id} value={a.id} className="text-white">{a.full_name || a.id}</SelectItem>
@@ -189,21 +189,21 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
       </Card>
 
       {period === "custom" && (
-        <Card className="mb-6 border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+        <Card className="mb-6 border-[#0ea5e9]/30 ">
           <CardHeader>
             <CardTitle className="text-white">Select Custom Period</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label className="text-neutral-700 dark:text-white/80">Start Date</Label>
-              <Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white" />
+              <Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white" />
             </div>
             <div>
               <Label className="text-neutral-700 dark:text-white/80">End Date</Label>
-              <Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white" />
+              <Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white" />
             </div>
             <div className="flex items-end">
-              <Button onClick={onApplyCustom} disabled={!customStart || !customEnd} className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white">Apply</Button>
+              <Button onClick={onApplyCustom} disabled={!customStart || !customEnd} className="w-full bg-[#0ea5e9] hover:bg-[#0284c7] text-white">Apply</Button>
             </div>
           </CardContent>
         </Card>
@@ -213,7 +213,7 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
         {isLoading || !report ? (
           <>
             {Array.from({ length: 6 }).map((_, i) => (
-              <Card key={i} className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+              <Card key={i} className="border-[#0ea5e9]/30 ">
                 <CardHeader>
                   <Skeleton className="h-5 w-32" />
                 </CardHeader>
@@ -225,27 +225,27 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
           </>
         ) : (
           <>
-            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <Card className="border-[#0ea5e9]/30 ">
               <CardHeader><CardTitle className="text-white">Sales Count</CardTitle></CardHeader>
               <CardContent className="text-2xl font-semibold text-white">{report?.totals?.salesCount || 0}</CardContent>
             </Card>
-            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <Card className="border-[#0ea5e9]/30 ">
               <CardHeader><CardTitle className="text-white">Sales Value</CardTitle></CardHeader>
               <CardContent className="text-2xl font-semibold text-green-500">{formatCurrency(report?.totals?.salesValue || 0)}</CardContent>
             </Card>
-            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <Card className="border-[#0ea5e9]/30 ">
               <CardHeader><CardTitle className="text-white">Buying Cost</CardTitle></CardHeader>
               <CardContent className="text-2xl font-semibold text-white">{formatCurrency(report?.totals?.buyingCost || 0)}</CardContent>
             </Card>
-            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <Card className="border-[#0ea5e9]/30 ">
               <CardHeader><CardTitle className="text-white">Gross Profit</CardTitle></CardHeader>
               <CardContent className="text-2xl font-semibold text-white">{formatCurrency(report?.totals?.grossProfit || 0)}</CardContent>
             </Card>
-            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <Card className="border-[#0ea5e9]/30 ">
               <CardHeader><CardTitle className="text-white">Salaries Deducted</CardTitle></CardHeader>
               <CardContent className="text-2xl font-semibold text-white">{formatCurrency(report?.totals?.salariesDeducted || 0)}</CardContent>
             </Card>
-            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <Card className="border-[#0ea5e9]/30 ">
               <CardHeader><CardTitle className="text-white">Net Profit</CardTitle></CardHeader>
               <CardContent className="text-2xl font-semibold text-white">{formatCurrency(report?.totals?.netProfit || 0)}</CardContent>
             </Card>
@@ -254,7 +254,7 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-        <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+        <Card className="border-[#0ea5e9]/30 ">
           <CardHeader><CardTitle className="text-white">Top-Selling Products</CardTitle></CardHeader>
           <CardContent>
             {isLoading || !report ? (
@@ -292,7 +292,7 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
           </CardContent>
         </Card>
         
-        <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+        <Card className="border-[#0ea5e9]/30 ">
           <CardHeader><CardTitle className="text-white">Admin Activity</CardTitle></CardHeader>
           <CardContent>
             {isLoading || !report ? (
@@ -336,16 +336,16 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
         </Card>
       </div>
 
-      <Card className="mt-6 border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+      <Card className="mt-6 border-[#0ea5e9]/30 ">
         <CardHeader>
           <CardTitle className="text-neutral-900 dark:text-white">Compare Sales</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <Button variant={compareMode === "day" ? "default" : "outline"} onClick={() => setCompareMode("day")} className={compareMode === "day" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>Day vs Day</Button>
-            <Button variant={compareMode === "week" ? "default" : "outline"} onClick={() => setCompareMode("week")} className={compareMode === "week" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>Week vs Week</Button>
-            <Button variant={compareMode === "month" ? "default" : "outline"} onClick={() => setCompareMode("month")} className={compareMode === "month" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>Month vs Month</Button>
-            <Button variant={compareMode === "year" ? "default" : "outline"} onClick={() => setCompareMode("year")} className={compareMode === "year" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}>Year vs Year</Button>
+            <Button variant={compareMode === "day" ? "default" : "outline"} onClick={() => setCompareMode("day")} className={compareMode === "day" ? "bg-[#0ea5e9] text-white" : "border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"}>Day vs Day</Button>
+            <Button variant={compareMode === "week" ? "default" : "outline"} onClick={() => setCompareMode("week")} className={compareMode === "week" ? "bg-[#0ea5e9] text-white" : "border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"}>Week vs Week</Button>
+            <Button variant={compareMode === "month" ? "default" : "outline"} onClick={() => setCompareMode("month")} className={compareMode === "month" ? "bg-[#0ea5e9] text-white" : "border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"}>Month vs Month</Button>
+            <Button variant={compareMode === "year" ? "default" : "outline"} onClick={() => setCompareMode("year")} className={compareMode === "year" ? "bg-[#0ea5e9] text-white" : "border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"}>Year vs Year</Button>
           </div>
           {cmpData.length === 2 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -353,10 +353,10 @@ export default function ReportsContent({ user, admin, report, admins }: any) {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={cmpData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#d7b0bd" />
-                    <XAxis dataKey="label" stroke="#7a1632" />
-                    <YAxis tickFormatter={(v) => `₦${Number(v||0).toLocaleString("en-NG")}`} stroke="#7a1632" />
-                    <Tooltip formatter={(v:any)=>[`₦${Number(v||0).toLocaleString("en-NG")}`, "Sales Value"]} labelFormatter={(l:any)=>String(l)} contentStyle={{ background: "#ffffff", border: "1px solid #7a1632", color: "#111" }} />
-                    <Bar dataKey="value" fill="#7a1632" radius={[4,4,0,0]} />
+                    <XAxis dataKey="label" stroke="#0ea5e9" />
+                    <YAxis tickFormatter={(v) => `₦${Number(v||0).toLocaleString("en-NG")}`} stroke="#0ea5e9" />
+                    <Tooltip formatter={(v:any)=>[`₦${Number(v||0).toLocaleString("en-NG")}`, "Sales Value"]} labelFormatter={(l:any)=>String(l)} contentStyle={{ background: "#ffffff", border: "1px solid #0ea5e9", color: "#111" }} />
+                    <Bar dataKey="value" fill="#0ea5e9" radius={[4,4,0,0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

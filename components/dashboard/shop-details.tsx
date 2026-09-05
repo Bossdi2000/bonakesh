@@ -19,13 +19,13 @@ export default function ShopDetails({ admin, user, shop, products }: any) {
             <h2 className="text-3xl font-bold text-neutral-900 dark:text-white">{shop.name}</h2>
             <p className="text-neutral-600 dark:text-white/70">{hidden ? "••••••" : (shop.address || "No address")}</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setHidden(!hidden)} className="text-[#7a1632] dark:text-white">
+          <Button variant="ghost" size="icon" onClick={() => setHidden(!hidden)} className="text-[#0ea5e9] dark:text-white">
             {hidden ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
           </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardHeader>
               <CardTitle className="text-neutral-900 dark:text-white">Total Products</CardTitle>
             </CardHeader>
@@ -33,18 +33,18 @@ export default function ShopDetails({ admin, user, shop, products }: any) {
               <div className="text-3xl font-bold text-neutral-900 dark:text-white">{totalProducts}</div>
             </CardContent>
           </Card>
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardHeader>
               <CardTitle className="text-neutral-900 dark:text-white">Total Inventory Value</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-[#7a1632] dark:text-white">{hidden ? "₦••••••" : `₦${totalValue.toLocaleString("en-NG")}`}</div>
+              <div className="text-3xl font-bold text-[#0ea5e9] dark:text-white">{hidden ? "₦••••••" : `₦${totalValue.toLocaleString("en-NG")}`}</div>
             </CardContent>
           </Card>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardHeader>
               <CardTitle className="text-neutral-900 dark:text-white">Recent Items</CardTitle>
             </CardHeader>
@@ -61,7 +61,7 @@ export default function ShopDetails({ admin, user, shop, products }: any) {
             </CardContent>
           </Card>
 
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardHeader>
               <CardTitle className="text-neutral-900 dark:text-white">Shop Information</CardTitle>
             </CardHeader>

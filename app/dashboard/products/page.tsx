@@ -1,36 +1,23 @@
-import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
 import { createServiceClient } from "@/lib/supabase/service"
 import ProductsContent from "@/components/dashboard/products-content"
-import { getAdminByUserIdServiceRole } from "@/lib/admins/server"
+import { requireSuperAdmin } from "@/lib/admins/require-admin"
 
 export default async function ProductsPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
+  const { user, admin } = await requireSuperAdmin()
 
-  if (authError || !user) {
-    redirect("/auth/login")
-  }
-
-  let { data: admin } = await supabase.from("admins").select("*").eq("id", user.id).single()
-
-  if (!admin) {
-    admin = await getAdminByUserIdServiceRole(user.id)
-    if (!admin) {
-      redirect("/auth/error")
-    }
-  }
-
-  if (admin.role !== "super_admin") {
-    redirect("/dashboard/checkout")
-  }
-
-  const { data: products } = await supabase.from("products").select("*").order("created_at", { ascending: false })
+  // Independent queries — run concurrently.
   const service = createServiceClient()
-  const { data: shops } = await service.from("shops").select("id,name").order("name")
+  const [productsRes, shopsRes] = await Promise.all([
+    service.from("products").select("*").order("created_at", { ascending: false }),
+    service.from("shops").select("id,name").order("name"),
+  ])
 
-  return <ProductsContent admin={admin} products={products || []} user={user} shops={shops || []} />
+  return (
+    <ProductsContent
+      admin={admin}
+      products={productsRes.data || []}
+      user={user}
+      shops={shopsRes.data || []}
+    />
+  )
 }

@@ -39,10 +39,12 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
   const formatCurrency = (n: number) => `₦${n.toLocaleString("en-NG")}`
 
   const handleToggle = () => {
-    if (!hidden) {
-      setHidden(true)
-    } else {
+    if (hidden) {
+      // Hidden -> clicking the eye opens the access-key dialog
       setDialogOpen(true)
+    } else {
+      // Visible -> hide balances immediately
+      setHidden(true)
     }
   }
 
@@ -56,6 +58,11 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
       snackbar.error("Invalid access key")
     }
   }
+
+  const handleCloseDialog = (open: boolean) => {
+    setDialogOpen(open)
+    if (!open) setAccessKey("")
+  }
   return (
     <DashboardLayout admin={admin} user={user}>
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -65,23 +72,23 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
         </div>
 
         <div className="flex justify-end mb-3">
-          <Button variant="ghost" size="icon" onClick={handleToggle} className="text-[#7a1632] dark:text-white">
+          <Button variant="ghost" size="icon" onClick={handleToggle} className="text-[#0ea5e9] dark:text-white">
             {hidden ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
           </Button>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardHeader>
               <CardTitle className="text-neutral-900 dark:text-white">Total Stock Value</CardTitle>
               <CardDescription className="text-neutral-600 dark:text-white/70">Combined selling value of all items</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-[#7a1632] dark:text-white">{hidden ? "₦••••" : formatCurrency(stats.totalStockValue)}</p>
+              <p className="text-3xl font-bold text-[#0ea5e9] dark:text-white">{hidden ? "₦••••" : formatCurrency(stats.totalStockValue)}</p>
             </CardContent>
           </Card>
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardHeader>
               <CardTitle className="text-neutral-900 dark:text-white">Total Bought Price</CardTitle>
               <CardDescription className="text-neutral-600 dark:text-white/70">Combined cost price of all items</CardDescription>
@@ -90,27 +97,27 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
               <p className="text-3xl font-bold text-neutral-900 dark:text-white">{hidden ? "₦••••" : formatCurrency(stats.totalBoughtPrice)}</p>
             </CardContent>
           </Card>
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardHeader>
               <CardTitle className="text-neutral-900 dark:text-white">Total Sales Revenue</CardTitle>
               <CardDescription className="text-neutral-600 dark:text-white/70">All-time revenue from completed transactions</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-[#7a1632] dark:text-white">{hidden ? "₦••••" : formatCurrency(stats.totalSellingPrice)}</p>
+              <p className="text-3xl font-bold text-[#0ea5e9] dark:text-white">{hidden ? "₦••••" : formatCurrency(stats.totalSellingPrice)}</p>
             </CardContent>
           </Card>
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardHeader>
               <CardTitle className="text-neutral-900 dark:text-white">Total Expected Profit</CardTitle>
               <CardDescription className="text-neutral-600 dark:text-white/70">Selling − Buying (current stock)</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className={"text-3xl font-bold " + (stats.totalExpectedProfit >= 0 ? "text-[#7a1632] dark:text-white" : "text-red-500")}> 
+              <p className={"text-3xl font-bold " + (stats.totalExpectedProfit >= 0 ? "text-[#0ea5e9] dark:text-white" : "text-red-500")}> 
                 {hidden ? "₦••••" : formatCurrency(stats.totalExpectedProfit)}
               </p>
             </CardContent>
           </Card>
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardHeader>
               <CardTitle className="text-neutral-900 dark:text-white">Total Transactions</CardTitle>
               <CardDescription className="text-neutral-600 dark:text-white/70">Count of completed sales</CardDescription>
@@ -121,19 +128,31 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
           </Card>
         </div>
 
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog open={dialogOpen} onOpenChange={handleCloseDialog}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Enter Access Key</DialogTitle>
               <DialogDescription>Enter the access key to show balances</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
-              <Input type="password" value={accessKey} onChange={(e) => setAccessKey(e.target.value)} placeholder="Access key" />
+            <form
+              className="space-y-4"
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleSubmit()
+              }}
+            >
+              <Input
+                type="password"
+                value={accessKey}
+                onChange={(e) => setAccessKey(e.target.value)}
+                placeholder="Access key"
+                autoFocus
+              />
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-                <Button onClick={handleSubmit}>Submit</Button>
+                <Button type="button" variant="outline" onClick={() => handleCloseDialog(false)}>Cancel</Button>
+                <Button type="submit">Submit</Button>
               </div>
-            </div>
+            </form>
           </DialogContent>
         </Dialog>
 
@@ -143,7 +162,7 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
           <div className="space-y-3">
             {recentTransactions.length > 0 ? (
               recentTransactions.map((tx) => (
-                <Card key={tx.id} className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13] hover:bg-[#7a1632]/5 dark:hover:bg-white/5 transition-colors">
+                <Card key={tx.id} className="border-[#0ea5e9]/30 hover:bg-[#0ea5e9]/5 dark:hover:bg-white/5 transition-colors">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex-1">
@@ -159,7 +178,7 @@ export default function DashboardContent({ user, admin, stats, recentTransaction
                 </Card>
               ))
             ) : (
-              <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+              <Card className="border-[#0ea5e9]/30 ">
                 <CardContent className="p-8 text-center">
                   <p className="text-neutral-600 dark:text-white/70">No recent transactions</p>
                 </CardContent>

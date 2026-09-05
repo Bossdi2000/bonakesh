@@ -42,7 +42,7 @@ export default function CheckoutLiveView({ adminId }: { adminId: string }) {
 
   return (
     <div className="space-y-6">
-      <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+      <Card className="border-[#0ea5e9]/30 ">
         <CardHeader>
           <CardTitle className="text-neutral-900 dark:text-white">Live Checkout</CardTitle>
         </CardHeader>
@@ -50,7 +50,7 @@ export default function CheckoutLiveView({ adminId }: { adminId: string }) {
           {cart.length > 0 ? (
             <div className="space-y-3">
               {cart.map((item) => (
-                <div key={item.product_id} className="flex items-center justify-between p-3 bg-[#7a1632]/5 dark:bg-white/5 rounded-lg">
+                <div key={item.product_id} className="flex items-center justify-between p-3 bg-[#0ea5e9]/5 dark:bg-white/5 rounded-lg">
                   <div>
                     <p className="text-neutral-900 dark:text-white font-medium">{item.name}</p>
                     <p className="text-neutral-600 dark:text-white/70 text-sm">
@@ -69,7 +69,7 @@ export default function CheckoutLiveView({ adminId }: { adminId: string }) {
         </CardContent>
       </Card>
 
-      <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+      <Card className="border-[#0ea5e9]/30 ">
         <CardHeader>
           <CardTitle className="text-neutral-900 dark:text-white">Summary</CardTitle>
         </CardHeader>
@@ -80,7 +80,7 @@ export default function CheckoutLiveView({ adminId }: { adminId: string }) {
           </div>
           <div className="flex justify-between text-neutral-700 dark:text-white/80">
             <span>Total:</span>
-            <span className="text-lg font-bold text-[#7a1632] dark:text-white">₦{total.toLocaleString("en-NG")}</span>
+            <span className="text-lg font-bold text-[#0ea5e9] dark:text-white">₦{total.toLocaleString("en-NG")}</span>
           </div>
           <div className="flex justify-between text-neutral-700 dark:text-white/80">
             <span>Payment Method:</span>

@@ -1,28 +1,9 @@
-import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
 import { createServiceClient } from "@/lib/supabase/service"
 import HistoryContent from "@/components/dashboard/history-content"
-import { getAdminByUserIdServiceRole } from "@/lib/admins/server"
+import { requireSuperAdmin } from "@/lib/admins/require-admin"
 
 export default async function HistoryPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    redirect("/auth/login")
-  }
-
-  let { data: admin } = await supabase.from("admins").select("*").eq("id", user.id).single()
-
-  if (!admin) {
-    admin = await getAdminByUserIdServiceRole(user.id)
-    if (!admin) {
-      redirect("/auth/error")
-    }
-  }
+  const { user, admin } = await requireSuperAdmin()
 
   const service = createServiceClient()
   const { data: rawLogs } = await service
@@ -42,7 +23,7 @@ export default async function HistoryPage() {
   }
 
   const logsRaw = (rawLogs || []).map((l: any) => ({ ...l, admins: adminsMap[l.admin_id] || null }))
-  const relatedSet = new Set(["product_restocked", "product_updated"]) 
+  const relatedSet = new Set(["product_restocked", "product_updated"])
   const grouped: any[] = []
   for (const log of logsRaw) {
     const last = grouped[grouped.length - 1]

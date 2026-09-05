@@ -207,18 +207,18 @@ const Receipt = forwardRef<HTMLDivElement, ReceiptProps>(({ transaction, items, 
                   <path id="topArc" d="M20,70 A80,55 0 0,1 180,70" />
                   <path id="bottomArc" d="M180,70 A80,55 0 0,1 20,70" />
                 </defs>
-                <ellipse cx="100" cy="70" rx="85" ry="60" fill="none" stroke="#7a1632" strokeWidth="4" />
-                <ellipse cx="100" cy="70" rx="75" ry="50" fill="none" stroke="#7a1632" strokeWidth="2" />
-                <text fill="#7a1632" fontSize="12" fontWeight="700" letterSpacing="1">
+                <ellipse cx="100" cy="70" rx="85" ry="60" fill="none" stroke="#0ea5e9" strokeWidth="4" />
+                <ellipse cx="100" cy="70" rx="75" ry="50" fill="none" stroke="#0ea5e9" strokeWidth="2" />
+                <text fill="#0ea5e9" fontSize="12" fontWeight="700" letterSpacing="1">
                   <textPath href="#topArc" startOffset="5%">MARSHALL ETHEL NIG. LTD.</textPath>
                 </text>
-                <text fill="#7a1632" fontSize="12" fontWeight="700" letterSpacing="1">
+                <text fill="#0ea5e9" fontSize="12" fontWeight="700" letterSpacing="1">
                   <textPath href="#bottomArc" startOffset="10%">CONFIRMED CHECKOUT</textPath>
                 </text>
                 <g>
                   <text x="100" y="68" textAnchor="middle" fill="#111827" fontSize="14" fontWeight="800">PAID</text>
                   <text x="100" y="88" textAnchor="middle" fill="#374151" fontSize="11">{dateStr}</text>
-                  <text x="100" y="108" textAnchor="middle" fill="#7a1632" fontSize="10">Owner's Sign: _______________________</text>
+                  <text x="100" y="108" textAnchor="middle" fill="#0ea5e9" fontSize="10">Owner's Sign: _______________________</text>
                 </g>
               </svg>
             </div>

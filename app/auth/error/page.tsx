@@ -9,7 +9,7 @@ export default function AuthErrorPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0f0b0c] p-4">
       <div className="w-full max-w-md">
-        <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+        <Card className="border-[#0ea5e9]/30 ">
           <CardHeader>
             <CardTitle className="text-neutral-900 dark:text-white flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-red-500" />
@@ -22,12 +22,12 @@ export default function AuthErrorPage() {
             </p>
             <div className="flex gap-2">
               <Link href="/auth/login" className="flex-1">
-                <Button className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white">Back to Login</Button>
+                <Button className="w-full bg-[#0ea5e9] hover:bg-[#0284c7] text-white">Back to Login</Button>
               </Link>
               <Link href="/" className="flex-1">
                 <Button
                   variant="outline"
-                  className="w-full border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10 bg-transparent"
+                  className="w-full border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10 bg-transparent"
                 >
                   Home
                 </Button>

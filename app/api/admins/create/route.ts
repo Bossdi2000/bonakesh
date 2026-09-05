@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient as createServerClient } from "../../../../lib/supabase/server"
 import { createServiceClient } from "../../../../lib/supabase/service"
+import { generateCodes } from "../../../../lib/admins/codes"
 
 export async function POST(req: Request) {
   try {
@@ -10,12 +11,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
+    const targetRole = role === "super_admin" ? "super_admin" : "store_manager"
+
     const supabaseServer = await createServerClient()
     const {
       data: { user },
     } = await supabaseServer.auth.getUser()
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    
+
     const service = createServiceClient()
     const { data: currentAdmin, error: roleError } = await service
       .from("admins")
@@ -48,7 +51,7 @@ export async function POST(req: Request) {
       id: userId,
       username,
       full_name,
-      role: role || "store_manager",
+      role: targetRole,
       status: "active",
     })
 
@@ -56,17 +59,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: profileError.message }, { status: 400 })
     }
 
+    // Store managers get 5 one-time login token codes.
+    let tokenCodes: string[] = []
+    if (targetRole === "store_manager") {
+      tokenCodes = generateCodes(5)
+      const { error: codeError } = await service.from("admin_token_codes").insert(
+        tokenCodes.map((code) => ({ admin_id: userId, code })),
+      )
+      if (codeError) {
+        return NextResponse.json({ error: codeError.message }, { status: 400 })
+      }
+    }
+
     await service.from("activity_log").insert({
       admin_id: user.id,
       action_type: "admin_created",
       entity_type: "admin",
       entity_id: userId,
-      details: { username, full_name, role: role || "store_manager" },
+      details: { username, full_name, role: targetRole, token_codes_generated: tokenCodes.length },
     })
 
     return NextResponse.json(
-      { id: userId, username, full_name, role: role || "store_manager" },
-      { status: 200 }
+      {
+        id: userId,
+        username,
+        full_name,
+        role: targetRole,
+        tokenCodes: tokenCodes.length > 0 ? tokenCodes : undefined,
+      },
+      { status: 200 },
     )
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || "Unexpected error" }, { status: 500 })

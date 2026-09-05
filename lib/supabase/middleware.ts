@@ -14,34 +14,24 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse
   }
 
-  const supabase = createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
-        },
-      },
-    },
-  )
+  const pathname = request.nextUrl.pathname
+  const isProtected = pathname.startsWith("/dashboard")
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // Fast auth check WITHOUT a network round-trip: Supabase stores its session
+  // in `sb-<ref>-auth-token` cookies. If none are present the visitor is signed
+  // out — redirect straight away instead of paying a ~0.5s getUser() call.
+  const hasSessionCookie = request.cookies
+    .getAll()
+    .some(({ name }) => name.startsWith("sb-") && name.includes("-auth-token"))
 
-  if (request.nextUrl.pathname.startsWith("/dashboard") && !user && !request.nextUrl.pathname.startsWith("/auth")) {
+  if (isProtected && !hasSessionCookie) {
     const url = request.nextUrl.clone()
     url.pathname = "/auth/login"
     return NextResponse.redirect(url)
   }
 
+  // Session cookie present: let the request through. The dashboard page itself
+  // (requireAdmin) validates the token with getUser() and refreshes it when
+  // needed, so we don't duplicate that network call on every navigation.
   return supabaseResponse
 }

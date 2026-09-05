@@ -53,13 +53,13 @@ export default function PasswordResetPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#0f0b0c] p-4">
             <div className="w-full max-w-md">
-                <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+                <Card className="border-[#0ea5e9]/30 ">
                     <CardHeader className="space-y-2">
                         <div className="flex items-center gap-2 mb-2">
-                            <div className="w-10 h-10 bg-[#7a1632] rounded-lg flex items-center justify-center">
+                            <div className="w-10 h-10 bg-[#0ea5e9] rounded-lg flex items-center justify-center">
                                 <span className="text-white font-bold text-lg">M</span>
                             </div>
-                            <h1 className="text-2xl font-bold text-[#7a1632] dark:text-white">MARSHALL ETHEL</h1>
+                            <h1 className="text-2xl font-bold text-[#0ea5e9] dark:text-white">MARSHALL ETHEL</h1>
                         </div>
                         <CardTitle className="text-neutral-900 dark:text-white">Reset Password</CardTitle>
                         <CardDescription className="text-neutral-600 dark:text-white/70">Enter your details to reset your account password</CardDescription>
@@ -72,7 +72,7 @@ export default function PasswordResetPage() {
                                     <AlertDescription className="text-green-500">Password updated successfully</AlertDescription>
                                 </Alert>
                                 <Link href="/auth/login">
-                                    <Button className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white">
+                                    <Button className="w-full bg-[#0ea5e9] hover:bg-[#0284c7] text-white">
                                         Return to Login
                                     </Button>
                                 </Link>
@@ -87,7 +87,7 @@ export default function PasswordResetPage() {
                                         onChange={(e) => setUsername(e.target.value)}
                                         required
                                         disabled={isLoading}
-                                        className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                                        className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -98,7 +98,7 @@ export default function PasswordResetPage() {
                                         onChange={(e) => setFullName(e.target.value)}
                                         required
                                         disabled={isLoading}
-                                        className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                                        className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -111,7 +111,7 @@ export default function PasswordResetPage() {
                                         required
                                         minLength={6}
                                         disabled={isLoading}
-                                        className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                                        className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                                     />
                                 </div>
 
@@ -122,12 +122,12 @@ export default function PasswordResetPage() {
                                     </Alert>
                                 )}
 
-                                <Button type="submit" disabled={isLoading} className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white">
+                                <Button type="submit" disabled={isLoading} className="w-full bg-[#0ea5e9] hover:bg-[#0284c7] text-white">
                                     {isLoading ? "Resetting..." : "Reset Password"}
                                 </Button>
 
                                 <div className="text-center text-sm">
-                                    <Link href="/auth/login" className="text-[#7a1632] hover:underline">
+                                    <Link href="/auth/login" className="text-[#0ea5e9] hover:underline">
                                         Back to Login
                                     </Link>
                                 </div>

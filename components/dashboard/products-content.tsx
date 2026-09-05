@@ -237,12 +237,12 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => handleOpenDialog()} className="bg-[#7a1632] hover:bg-[#66122a] text-white">
+              <Button onClick={() => handleOpenDialog()} className="bg-[#0ea5e9] hover:bg-[#0284c7] text-white">
                 <Plus className="w-4 h-4 mr-2" />
                 Add New Stock
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30 max-h-[80vh] overflow-y-auto">
+            <DialogContent className="border-[#0ea5e9]/30 max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-neutral-900 dark:text-white">{editingId ? "Edit Product" : "Add New Product"}</DialogTitle>
                 <DialogDescription className="text-neutral-600 dark:text-white/70">
@@ -256,7 +256,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                     placeholder="e.g., Refrigerator XL"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                    className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                   />
                 </div>
                 <div>
@@ -265,7 +265,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                     placeholder="e.g., RF-XL-001"
                     value={(formData as any).sku || ""}
                     onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                    className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -275,7 +275,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                       placeholder="e.g., SN-12345ABC"
                       value={(formData as any).serial_number || ""}
                       onChange={(e) => setFormData({ ...formData, serial_number: e.target.value })}
-                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                      className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                     />
                   </div>
                   <div>
@@ -284,12 +284,12 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                       placeholder="e.g., MD-XL-2000"
                       value={(formData as any).model_number || ""}
                       onChange={(e) => setFormData({ ...formData, model_number: e.target.value })}
-                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                      className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                     />
                   </div>
                 </div>
                 {/* Computed Previews */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#7a1632]/5 dark:bg-white/5 p-4 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#0ea5e9]/5 dark:bg-white/5 p-4 rounded-lg">
                   <div>
                     <p className="text-neutral-600 dark:text-white/70 text-sm">Total Bought Value</p>
                     <p className="text-neutral-900 dark:text-white text-lg font-semibold">
@@ -329,10 +329,10 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                   <div>
                     <Label className="text-neutral-700 dark:text-white/80">Shop</Label>
                     <Select value={selectedShopId} onValueChange={setSelectedShopId}>
-                      <SelectTrigger className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white">
+                      <SelectTrigger className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white">
                         <SelectValue placeholder="Select shop" />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-[#1a0d13]">
+                      <SelectContent className="">
                         {shops.map((s: any) => (
                           <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                         ))}
@@ -351,7 +351,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                           buying_price: e.target.value,
                         })
                       }
-                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                      className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                     />
                   </div>
                   <div>
@@ -366,7 +366,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                           selling_price: e.target.value,
                         })
                       }
-                      className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                      className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                     />
                   </div>
                 </div>
@@ -377,13 +377,13 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                     placeholder="0"
                     value={formData.quantity}
                     onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                    className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                    className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                   />
                 </div>
                 <Button
                   onClick={handleSaveProduct}
                   disabled={isLoading}
-                  className="w-full bg-[#7a1632] hover:bg-[#66122a] text-white"
+                  className="w-full bg-[#0ea5e9] hover:bg-[#0284c7] text-white"
                 >
                   {isLoading ? "Saving..." : editingId ? "Update Product" : "Add Product"}
                 </Button>
@@ -393,26 +393,26 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
         </div>
 
         <div className="flex justify-end">
-          <Button variant="ghost" size="icon" onClick={handleToggle} className="text-[#7a1632] dark:text-white">
+          <Button variant="ghost" size="icon" onClick={handleToggle} className="text-[#0ea5e9] dark:text-white">
             {hidden ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
           </Button>
         </div>
 
         {/* Summary Cards */}
         <div className="grid md:grid-cols-3 gap-4">
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardContent className="p-6">
               <p className="text-neutral-600 dark:text-white/70 text-sm mb-1">Total Products</p>
               <p className="text-3xl font-bold text-neutral-900 dark:text-white">{products.length}</p>
             </CardContent>
           </Card>
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardContent className="p-6">
               <p className="text-neutral-600 dark:text-white/70 text-sm mb-1">Total Bought Value</p>
               <p className="text-3xl font-bold text-neutral-900 dark:text-white">{hidden ? "₦••••" : formatCurrency(totalBoughtValue)}</p>
             </CardContent>
           </Card>
-          <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+          <Card className="border-[#0ea5e9]/30 ">
             <CardContent className="p-6">
               <p className="text-neutral-600 dark:text-white/70 text-sm mb-1">Expected Profit</p>
               <p className={`text-3xl font-bold ${expectedProfit >= 0 ? "text-green-500" : "text-red-500"}`}>
@@ -428,12 +428,12 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
             placeholder="Search products..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+            className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
           />
         </div>
 
         {/* Products Table */}
-        <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+        <Card className="border-[#0ea5e9]/30 ">
           <CardHeader>
             <CardTitle className="text-neutral-900 dark:text-white">Products</CardTitle>
           </CardHeader>
@@ -441,7 +441,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#7a1632]/30">
+                  <tr className="border-b border-[#0ea5e9]/30">
                     <th className="text-left py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Name</th>
                     <th className="text-right py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Buy Price</th>
                     <th className="text-right py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Sell Price</th>
@@ -455,7 +455,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                     filteredProducts.map((product: any) => (
                       <tr
                         key={product.id}
-                        className="border-b border-[#7a1632]/30 hover:bg-[#7a1632]/5 dark:hover:bg-white/5 transition-colors"
+                        className="border-b border-[#0ea5e9]/30 hover:bg-[#0ea5e9]/5 dark:hover:bg-white/5 transition-colors"
                       >
                         <td className="py-3 px-4 text-neutral-900 dark:text-white">{product.name}</td>
                         <td className="text-right py-3 px-4 text-neutral-700 dark:text-white/80">
@@ -475,7 +475,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                               variant="outline"
                               size="sm"
                               onClick={() => handleOpenRestock(product)}
-                              className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
+                              className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"
                             >
                               + Restock
                             </Button>
@@ -483,7 +483,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                               variant="outline"
                               size="sm"
                               onClick={() => handleOpenDialog(product)}
-                              className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
+                              className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"
                             >
                               <Edit2 className="w-4 h-4" />
                             </Button>
@@ -544,7 +544,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
       />
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
+        <AlertDialogContent className="border-[#0ea5e9]/30">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-neutral-900 dark:text-white">Delete Product</AlertDialogTitle>
             <AlertDialogDescription className="text-neutral-600 dark:text-white/70">
@@ -552,7 +552,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeleteOpen(false)} className="border-[#7a1632]/30">Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setDeleteOpen(false)} className="border-[#0ea5e9]/30">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
                 if (!deleteId) return
@@ -575,7 +575,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
 export function RestockDialog({ open, onOpenChange, qty, setQty, product, onConfirm, loading, error }: any) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30 max-h-[80vh] overflow-y-auto">
+      <DialogContent className="border-[#0ea5e9]/30 max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-neutral-900 dark:text-white">Restock Product</DialogTitle>
           <DialogDescription className="text-neutral-600 dark:text-white/70">
@@ -591,17 +591,17 @@ export function RestockDialog({ open, onOpenChange, qty, setQty, product, onConf
               placeholder="0"
               value={qty}
               onChange={(e) => setQty(e.target.value)}
-              className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+              className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
             />
           </div>
           {error && (
             <p className="text-red-500 text-sm">{error}</p>
           )}
           <div className="flex gap-2 justify-end">
-            <Button variant="outline" className="border-[#7a1632]/30" onClick={() => onOpenChange(false)}>
+            <Button variant="outline" className="border-[#0ea5e9]/30" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button onClick={onConfirm} disabled={loading} className="bg-[#7a1632] hover:bg-[#66122a] text-white">
+            <Button onClick={onConfirm} disabled={loading} className="bg-[#0ea5e9] hover:bg-[#0284c7] text-white">
               {loading ? "Restocking..." : "Confirm"}
             </Button>
           </div>

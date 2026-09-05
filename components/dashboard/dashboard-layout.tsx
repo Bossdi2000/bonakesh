@@ -4,6 +4,7 @@ import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { BarChart3, Package, ShoppingCart, Users, History, Settings, LogOut, Menu, X, Moon, Sun, Eye, Building2 } from "lucide-react"
 import { useTheme } from "@/hooks/use-theme"
@@ -51,30 +52,30 @@ export default function DashboardLayout({ admin, user, children }: any) {
   const isActive = (href: string) => pathname === href
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f0b0c]">
+    <div className="min-h-screen bg-transparent">
       {/* Header */}
-      <header className="border-b border-[#7a1632]/20 bg-white/90 dark:bg-[#1a0d13]/80 backdrop-blur sticky top-0 z-40">
+      <header className="border-b border-sky-200 dark:border-sky-900/40 bg-white/90 dark:bg-[#0a0f14]/90 backdrop-blur sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden text-[#7a1632] hover:text-[#66122a] dark:text-white">
+            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden text-sky-600 hover:text-sky-700 dark:text-sky-300">
               {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
             <Link href="/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#7a1632] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">M</span>
+              <div className="w-10 h-10 rounded-full overflow-hidden border border-[#0ea5e9]/40">
+                <Image src="/logo.jpg" alt="Marshall Ethel Logo" width={40} height={40} className="object-cover w-full h-full" />
               </div>
-              <h1 className="text-xl font-bold text-[#7a1632] dark:text-white hidden sm:inline">MARSHALL ETHEL</h1>
+              <h1 className="text-xl font-bold text-sky-700 dark:text-sky-300 hidden sm:inline">MARSHALL ETHEL</h1>
             </Link>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium text-[#7a1632] dark:text-white">{admin?.full_name || user?.email}</p>
-              <p className="text-xs text-neutral-600 dark:text-white/70 capitalize">{admin?.role?.replace("_", " ")}</p>
+              <p className="text-sm font-medium text-sky-800 dark:text-sky-100">{admin?.full_name || user?.email}</p>
+              <p className="text-xs text-sky-600/80 dark:text-sky-300/70 capitalize">{admin?.role?.replace("_", " ")}</p>
             </div>
             {mounted && (
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg bg-neutral-100 dark:bg-[#2a1620] hover:bg-neutral-200 dark:hover:bg-[#3a1a28] text-[#7a1632] dark:text-white transition-colors"
+                className="p-2 rounded-lg bg-sky-100 dark:bg-sky-900/50 hover:bg-sky-200 dark:hover:bg-sky-800/50 text-sky-700 dark:text-sky-200 transition-colors"
                 aria-label="Toggle dark mode"
               >
                 {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
@@ -85,7 +86,7 @@ export default function DashboardLayout({ admin, user, children }: any) {
               disabled={isLoading}
               variant="outline"
               size="sm"
-              className="border-[#7a1632]/40 text-[#7a1632] hover:bg-[#7a1632]/10 bg-transparent dark:text-white"
+              className="border-sky-300 text-sky-700 hover:bg-sky-50 bg-transparent dark:border-sky-700 dark:text-sky-200 dark:hover:bg-sky-900/40"
             >
               <LogOut className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Logout</span>
@@ -95,14 +96,20 @@ export default function DashboardLayout({ admin, user, children }: any) {
       </header>
 
       {/* Sidebar + Content */}
-      <div className="flex">
-        {/* Sidebar */}
+      <div className="flex items-start">
+        {/* Sidebar - sticky, stays in place while content scrolls, own bg image */}
         <aside
           className={`${
             sidebarOpen ? "block" : "hidden"
-          } md:block w-full md:w-64 border-r border-[#7a1632]/20 bg-white dark:bg-[#1a0d13] p-4 fixed md:static md:h-[calc(100vh-73px)] z-30`}
+          } md:block w-full md:w-64 border-r border-sky-200 dark:border-sky-900/40 p-4 sticky top-[73px] z-30 overflow-y-auto max-h-[calc(100vh-73px)] md:shrink-0 bg-cover bg-center relative`}
+          style={{
+            backgroundImage:
+              theme === "dark"
+                ? "linear-gradient(rgba(10,15,20,0.92), rgba(10,15,20,0.92)), url('/dashboard-bg.jpg')"
+                : "linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92)), url('/dashboard-bg.jpg')",
+          }}
         >
-          <nav className="space-y-2">
+          <nav className="space-y-2 relative">
             {menuItems.map((item) => {
               const Icon = item.icon
               const active = isActive(item.href)
@@ -113,8 +120,8 @@ export default function DashboardLayout({ admin, user, children }: any) {
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
                     active
-                      ? "bg-[#7a1632] text-white"
-                      : "text-[#7a1632] hover:bg-[#7a1632]/10 dark:text-white dark:hover:bg-white/10"
+                      ? "bg-sky-500 text-white shadow-sm"
+                      : "text-sky-900 hover:bg-sky-100 dark:text-sky-100 dark:hover:bg-sky-900/40"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -126,7 +133,7 @@ export default function DashboardLayout({ admin, user, children }: any) {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto p-4 md:p-8">{children}</main>
+        <main className="flex-1 overflow-auto p-4 md:p-8 w-full min-w-0">{children}</main>
       </div>
     </div>
   )

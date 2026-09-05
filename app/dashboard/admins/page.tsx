@@ -1,29 +1,9 @@
-import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
 import AdminManagementContent from "@/components/dashboard/admin-management-content"
-import { getAdminByUserIdServiceRole } from "@/lib/admins/server"
 import { getAllAdminsServiceRole } from "@/lib/admins/get-all"
+import { requireSuperAdmin } from "@/lib/admins/require-admin"
 
 export default async function AdminsPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    redirect("/auth/login")
-  }
-
-  let { data: admin } = await supabase.from("admins").select("*").eq("id", user.id).single()
-
-  if (!admin) {
-    admin = await getAdminByUserIdServiceRole(user.id)
-  }
-
-  if (!admin || admin.role !== "super_admin") {
-    redirect("/dashboard")
-  }
+  const { user, admin, supabase } = await requireSuperAdmin()
 
   let { data: admins } = await supabase
     .from("admins")

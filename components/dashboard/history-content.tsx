@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { createClient } from "@/lib/supabase/client"
-import Receipt from "./receipt"
+import Invoice from "./invoice"
 import { Printer, Loader2, LayoutGrid, ShoppingCart, Package, ShieldCheck } from "lucide-react"
 import { snackbar } from "@/lib/ui/snackbar"
 
@@ -128,7 +128,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
     if (actionType.includes("delete")) return "bg-red-600"
     if (actionType.includes("create")) return "bg-green-600"
     if (actionType.includes("update") || actionType.includes("changed")) return "bg-yellow-600"
-    return "bg-[#7a1632]"
+    return "bg-[#0ea5e9]"
   }
 
   const handleReprint = async (log: any) => {
@@ -234,7 +234,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
           </Button>
         </div>
 
-        <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+        <Card className="border-[#0ea5e9]/30 ">
           <CardHeader>
             <CardTitle className="text-neutral-900 dark:text-white">Search & Filter</CardTitle>
           </CardHeader>
@@ -243,28 +243,28 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
               <Button
                 variant={actionType === "all" ? "default" : "outline"}
                 onClick={() => setActionType("all")}
-                className={actionType === "all" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}
+                className={actionType === "all" ? "bg-[#0ea5e9] text-white" : "border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"}
               >
                 All ({totalCount})
               </Button>
               <Button
                 variant={actionType === "login_success" ? "default" : "outline"}
                 onClick={() => setActionType("login_success")}
-                className={actionType === "login_success" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}
+                className={actionType === "login_success" ? "bg-[#0ea5e9] text-white" : "border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"}
               >
                 Logins ({loginSuccessCount})
               </Button>
               <Button
                 variant={actionType === "login_failure" ? "default" : "outline"}
                 onClick={() => setActionType("login_failure")}
-                className={actionType === "login_failure" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}
+                className={actionType === "login_failure" ? "bg-[#0ea5e9] text-white" : "border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"}
               >
                 Failures ({loginFailureCount})
               </Button>
               <Button
                 variant={actionType === "logout" ? "default" : "outline"}
                 onClick={() => setActionType("logout")}
-                className={actionType === "logout" ? "bg-[#7a1632] text-white" : "border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"}
+                className={actionType === "logout" ? "bg-[#0ea5e9] text-white" : "border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"}
               >
                 Logouts ({logoutCount})
               </Button>
@@ -276,16 +276,16 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
                   placeholder="Search actions, items..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                  className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                 />
               </div>
               <div>
                 <Label className="text-neutral-700 dark:text-white/80">Admin</Label>
                 <Select value={adminName} onValueChange={setAdminName}>
-                  <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
+                  <SelectTrigger className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30 text-neutral-900 dark:text-white">
                     <SelectValue placeholder="All admins" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                  <SelectContent className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30">
                     <SelectItem value="all" className="text-neutral-900 dark:text-white">All</SelectItem>
                     {adminNames.map((n: string) => (
                       <SelectItem key={n} value={n} className="text-neutral-900 dark:text-white">
@@ -298,10 +298,10 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
               <div>
                 <Label className="text-neutral-700 dark:text-white/80">Action Type</Label>
                 <Select value={actionType} onValueChange={setActionType}>
-                  <SelectTrigger className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30 text-neutral-900 dark:text-white">
+                  <SelectTrigger className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30 text-neutral-900 dark:text-white">
                     <SelectValue placeholder="All actions" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-[#140a0f] border-[#7a1632]/30">
+                  <SelectContent className="bg-white dark:bg-[#0a1620] border-[#0ea5e9]/30">
                     <SelectItem value="all" className="text-neutral-900 dark:text-white">All</SelectItem>
                     {actionTypes.map((t: string) => (
                       <SelectItem key={t} value={t} className="text-neutral-900 dark:text-white">
@@ -317,7 +317,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                  className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                 />
               </div>
               <div>
@@ -326,7 +326,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="bg-white border-[#7a1632]/30 text-neutral-900 dark:bg-[#140a0f] dark:text-white"
+                  className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
                 />
               </div>
             </div>
@@ -337,7 +337,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
           {!logs ? (
             <>
               {Array.from({ length: 8 }).map((_, i) => (
-                <Card key={i} className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+                <Card key={i} className="border-[#0ea5e9]/30 ">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 space-y-2">
@@ -352,10 +352,9 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
             </>
           ) : filteredLogs.length > 0 ? (
             filteredLogs.map((log: any) => (
-              <Card
-                key={log.id}
-                className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13] hover:bg-[#7a1632]/5 dark:hover:bg-white/5 cursor-pointer"
-                onClick={() => {
+              <Card key={log.id}
+ className="border-[#0ea5e9]/30 hover:bg-[#0ea5e9]/5 dark:hover:bg-white/5 cursor-pointer"
+ onClick={() => {
                   setSelected(log)
                   setOpen(true)
                 }}
@@ -366,7 +365,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
                       <div className="flex items-center gap-2 mb-1">
                         <Badge className={getActionColor(log.action_type)}>{log.action_type.replace("_", " ")}</Badge>
                         {Array.isArray(log.grouped) && log.grouped.length > 0 && (
-                          <Badge className="bg-[#7a1632] text-white">+{log.grouped.length} related</Badge>
+                          <Badge className="bg-[#0ea5e9] text-white">+{log.grouped.length} related</Badge>
                         )}
                         {log.entity_type && <span className="text-xs text-neutral-600 dark:text-white/70">{log.entity_type}</span>}
                       </div>
@@ -378,14 +377,14 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
                     <div className="text-right">
                       <p className="text-xs text-neutral-500 dark:text-white/70">{new Date(log.created_at).toLocaleString()}</p>
                       <div className="flex items-center gap-2 justify-end">
-                        <a href={`/dashboard/history/${log.id}`} className="text-xs text-[#7a1632] underline hover:text-[#66122a]">Open</a>
+                        <a href={`/dashboard/history/${log.id}`} className="text-xs text-[#0ea5e9] underline hover:text-[#0284c7]">Open</a>
                         {log.entity_type === "transaction" ? (
                           <Button
                             size="sm"
                             variant="outline"
                             disabled={isLoading}
                             onClick={(e) => { e.stopPropagation(); handleReprint(log) }}
-                            className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
+                            className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"
                           >
                             Reprint
                           </Button>
@@ -397,7 +396,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
               </Card>
             ))
           ) : (
-            <Card className="border-[#7a1632]/30 bg-white dark:bg-[#1a0d13]">
+            <Card className="border-[#0ea5e9]/30 ">
               <CardContent className="p-8 text-center">
                 <p className="text-neutral-600 dark:text-white/70">No activities found</p>
               </CardContent>
@@ -406,7 +405,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30">
+          <DialogContent className="border-[#0ea5e9]/30">
             <DialogHeader>
               <DialogTitle className="text-neutral-900 dark:text-white">Activity Details</DialogTitle>
               <DialogDescription className="text-neutral-600 dark:text-white/70">Full information about the selected activity</DialogDescription>
@@ -435,7 +434,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
                 </div>
                 <div>
                   <span className="text-neutral-600 dark:text-white/70">Details</span>
-                  <div className="mt-2 rounded bg-[#7a1632]/5 dark:bg-white/5 p-3 text-neutral-800 dark:text-white break-words">
+                  <div className="mt-2 rounded bg-[#0ea5e9]/5 dark:bg-white/5 p-3 text-neutral-800 dark:text-white break-words">
                     {typeof selected.details === "object" && selected.details !== null
                       ? Object.entries(selected.details).map(([k, v]) => (
                           <div key={k} className="flex justify-between">
@@ -451,12 +450,12 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
                     <span className="text-neutral-600 dark:text-white/70">Related</span>
                     <div className="mt-2 space-y-2">
                       {(selected as any).grouped.map((g: any) => (
-                        <div key={g.id} className="rounded border border-[#7a1632]/30 p-2">
+                        <div key={g.id} className="rounded border border-[#0ea5e9]/30 p-2">
                           <div className="flex items-center gap-2">
                             <Badge className={getActionColor(g.action_type)}>{g.action_type.replace("_", " ")}</Badge>
                             <span className="text-xs text-neutral-600 dark:text-white/70">{new Date(g.created_at).toLocaleString()}</span>
                           </div>
-                          <div className="mt-1 rounded bg-[#7a1632]/5 dark:bg-white/5 p-2 text-neutral-800 dark:text-white break-words">
+                          <div className="mt-1 rounded bg-[#0ea5e9]/5 dark:bg-white/5 p-2 text-neutral-800 dark:text-white break-words">
                             {typeof g.details === "object" && g.details !== null
                               ? Object.entries(g.details).map(([k, v]) => (
                                   <div key={k} className="flex justify-between">
@@ -476,7 +475,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
                     <Button
                       onClick={() => handleReprint(selected)}
                       disabled={isLoading}
-                      className="bg-[#7a1632] hover:bg-[#66122a] text-white"
+                      className="bg-[#0ea5e9] hover:bg-[#0284c7] text-white"
                     >
                       <Printer className="w-4 h-4 mr-2" />
                       Reprint Receipt
@@ -489,32 +488,36 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
         </Dialog>
 
         <Dialog open={reprintOpen} onOpenChange={setReprintOpen}>
-          <DialogContent className="bg-white dark:bg-[#1a0d13] border-[#7a1632]/30 max-w-2xl max-h-[85vh] overflow-auto">
+          <DialogContent className="border-[#0ea5e9]/30 max-w-2xl max-h-[85vh] overflow-auto">
             <DialogHeader>
               <DialogTitle className="text-neutral-900 dark:text-white">Transaction Receipt</DialogTitle>
               <DialogDescription className="text-neutral-600 dark:text-white/70">Reprint of a completed checkout</DialogDescription>
             </DialogHeader>
             {reprintTransaction ? (
               <div className="space-y-3">
-                <Receipt
+                <Invoice
                   ref={receiptRef}
-                  transaction={reprintTransaction}
-                  items={receiptItems}
-                  admin={admin}
-                  user={user}
-                  customerName={customerName}
-                  customerAddress={customerAddress}
-                  customerPhone={customerPhone}
+                  invoiceNo={String(reprintTransaction.id).slice(0, 6).toUpperCase()}
+                  date={reprintTransaction.transaction_date || reprintTransaction.created_at}
+                  customer={{ name: customerName, address: customerAddress, phone: customerPhone }}
+                  items={receiptItems.map((it: any) => ({
+                    qty: it.quantity,
+                    description: it.name,
+                    mn: it.model_no || "",
+                    sn: it.serial_no || "",
+                    rate: it.price_per_unit,
+                  }))}
+                  total={Number(reprintTransaction.total_amount)}
                 />
                 <div className="flex flex-wrap gap-2 justify-center sticky bottom-0 pt-2">
-                  <Button onClick={handlePrintReceipt} className="bg-[#7a1632] hover:bg-[#66122a] text-white">
+                  <Button onClick={handlePrintReceipt} className="bg-[#0ea5e9] hover:bg-[#0284c7] text-white">
                     <Printer className="w-4 h-4 mr-2" />
                     Print
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => window.open(`/dashboard/checkout/receipt/${reprintTransaction.id}?print=1`, "_blank")}
-                    className="border-[#7a1632]/30 text-neutral-700 dark:text-white/80 hover:bg-[#7a1632]/10 dark:hover:bg-white/10"
+                    className="border-[#0ea5e9]/30 text-neutral-700 dark:text-white/80 hover:bg-[#0ea5e9]/10 dark:hover:bg-white/10"
                   >
                     Open Full Page
                   </Button>
