@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,7 +16,13 @@ export default function KeepAlivePage() {
     // 4 days in milliseconds
     const INTERVAL_MS = 4 * 24 * 60 * 60 * 1000
 
-    const supabase = createClient()
+    const supabaseRef = useRef<any>(null)
+    const getSupabase = () => {
+        if (!supabaseRef.current) {
+            supabaseRef.current = createClient()
+        }
+        return supabaseRef.current
+    }
 
     useEffect(() => {
         // Load state from localStorage on mount
@@ -74,7 +80,7 @@ export default function KeepAlivePage() {
 
         try {
             // Simple query to wake up the DB
-            const { data, error } = await supabase.from('products').select('id').limit(1)
+            const { data, error } = await getSupabase().from('products').select('id').limit(1)
 
             if (error) throw error
 
