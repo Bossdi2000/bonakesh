@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import Invoice from "../../../../../components/dashboard/invoice"
+import { getReceiptNumber } from "@/lib/receipt-number"
 
 export default function ReceiptPage() {
   const supabase = createClient()
@@ -13,6 +14,7 @@ export default function ReceiptPage() {
   const [customer, setCustomer] = useState<{ name?: string; address?: string; phone?: string } | null>(null)
   const [error, setError] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(true)
+  const [receiptNo, setReceiptNo] = useState<string>("")
 
   useEffect(() => {
     let cancelled = false
@@ -58,6 +60,7 @@ export default function ReceiptPage() {
               address: det?.customer_address || "",
               phone: det?.customer_phone || "",
             })
+            setReceiptNo(await getReceiptNumber(supabase, tx.id))
             setLoading(false)
           }
           return
@@ -83,9 +86,9 @@ export default function ReceiptPage() {
     </div>
   )
 
-  // Invoice number: prefer transaction id (short form) — the physical book uses sequential numbers,
-  // but this app has no dedicated receipt_no column, so we show a stable short id.
-  const invoiceNo = String(transaction.id).slice(0, 6).toUpperCase()
+  // Receipt number: sequential across all transactions (1, 2, 3, ...).
+  // Falls back to a stable short id only if the sequence can't be resolved.
+  const invoiceNo = receiptNo || String(transaction.id).slice(0, 6).toUpperCase()
 
   return (
     <div style={{ background: "#fff", minHeight: "100vh", display: "flex", justifyContent: "center", padding: "8px" }}>

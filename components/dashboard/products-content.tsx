@@ -51,6 +51,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
   const [selectedShopId, setSelectedShopId] = useState<string>("")
   const [searchTerm, setSearchTerm] = useState("")
   const router = useRouter()
+  const shopById = new Map<string, string>((shops || []).map((s: any) => [s.id, s.name]))
 
   const ACCESS_KEY = "marshall-ethel-secret"
   const [hidden, setHidden] = useState(false)
@@ -221,7 +222,16 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
     }
   }
 
-  const filteredProducts = products.filter((p: any) => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredProducts = products.filter((p: any) => {
+    const q = searchTerm.toLowerCase()
+    const location = shopById.get(p.shop_id) || ""
+    return (
+      p.name.toLowerCase().includes(q) ||
+      String(p.model_number || "").toLowerCase().includes(q) ||
+      String(p.sku || "").toLowerCase().includes(q) ||
+      location.toLowerCase().includes(q)
+    )
+  })
 
   const totalBoughtValue = products.reduce((acc: number, p: any) => acc + p.buying_price * p.quantity, 0)
   const totalSellingValue = products.reduce((acc: number, p: any) => acc + p.selling_price * p.quantity, 0)
@@ -443,6 +453,8 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                 <thead>
                   <tr className="border-b border-[#0ea5e9]/30">
                     <th className="text-left py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Name</th>
+                    <th className="text-left py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Model</th>
+                    <th className="text-left py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Location</th>
                     <th className="text-right py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Buy Price</th>
                     <th className="text-right py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Sell Price</th>
                     <th className="text-right py-3 px-4 text-neutral-700 dark:text-white/80 font-medium">Qty</th>
@@ -458,6 +470,12 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                         className="border-b border-[#0ea5e9]/30 hover:bg-[#0ea5e9]/5 dark:hover:bg-white/5 transition-colors"
                       >
                         <td className="py-3 px-4 text-neutral-900 dark:text-white">{product.name}</td>
+                        <td className="py-3 px-4 text-neutral-700 dark:text-white/80">
+                          {product.model_number || <span className="text-neutral-400 dark:text-white/40">—</span>}
+                        </td>
+                        <td className="py-3 px-4 text-neutral-700 dark:text-white/80">
+                          {shopById.get(product.shop_id) || <span className="text-neutral-400 dark:text-white/40">—</span>}
+                        </td>
                         <td className="text-right py-3 px-4 text-neutral-700 dark:text-white/80">
                           {hidden ? "₦••••" : formatCurrency(product.buying_price)}
                         </td>
@@ -505,7 +523,7 @@ export default function ProductsContent({ admin, products, user, shops = [] }: a
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="py-8 text-center text-neutral-600 dark:text-white/70">
+                      <td colSpan={8} className="py-8 text-center text-neutral-600 dark:text-white/70">
                         No products found
                       </td>
                     </tr>

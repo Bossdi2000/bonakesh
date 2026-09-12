@@ -20,5 +20,9 @@ export default async function ShopDetailPage({ params }: { params: Promise<{ id:
     .eq("shop_id", id)
     .order("created_at", { ascending: false })
 
-  return <ShopDetails admin={admin} user={user} shop={shop} products={products || []} />
+  const { data: allShops } = await service.from("shops").select("id,name").order("name")
+
+  return (
+    <ShopDetails admin={admin} user={user} shop={shop} products={products || []} shops={allShops || []} />
+  )
 }

@@ -10,6 +10,8 @@ const RED = "#c00000"
 const BLUE = "#1a3f95"
 const INK = "#111111"
 const LINE = "#111111"
+const STRIPE = "rgba(192, 0, 0, 0.08)"
+const ROW_H = "5.6mm"
 
 /* Amount in words (Naira) */
 const ONES = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"]
@@ -20,8 +22,17 @@ function twoDigits(n: number): string {
   return `${TENS[Math.floor(n / 10)]}${n % 10 ? " " + ONES[n % 10] : ""}`
 }
 
+/* Covers a full 0-999 group; twoDigits only understands 0-99, which is why
+   3-digit groups (e.g. 100,000 -> hundreds group "100") rendered as undefined. */
+function threeDigits(n: number): string {
+  if (n < 100) return twoDigits(n)
+  const hundreds = Math.floor(n / 100)
+  const rest = n % 100
+  return `${ONES[hundreds]} Hundred${rest ? " and " + twoDigits(rest) : ""}`
+}
+
 export function amountInWords(amount: number): string {
-  if (!amount || isNaN(amount)) return "Zero Naira"
+  if (amount == null || isNaN(amount)) return "Zero Naira"
   const n = Math.round(amount)
   if (n === 0) return "Zero Naira"
   let words = ""
@@ -29,13 +40,10 @@ export function amountInWords(amount: number): string {
   const millions = Math.floor((n % 1_000_000_000) / 1_000_000)
   const thousands = Math.floor((n % 1_000_000) / 1_000)
   const rest = n % 1_000
-  if (billions) words += twoDigits(billions) + " Billion "
-  if (millions) words += twoDigits(millions) + " Million "
-  if (thousands) words += twoDigits(thousands) + " Thousand "
-  if (rest) {
-    if (rest < 100) words += twoDigits(rest)
-    else words += `${ONES[Math.floor(rest / 100)]} Hundred${rest % 100 ? " and " + twoDigits(rest % 100) : ""}`
-  }
+  if (billions) words += threeDigits(billions) + " Billion "
+  if (millions) words += threeDigits(millions) + " Million "
+  if (thousands) words += threeDigits(thousands) + " Thousand "
+  if (rest) words += threeDigits(rest)
   return words.trim() + " Naira"
 }
 
@@ -201,16 +209,12 @@ const Invoice = forwardRef<HTMLDivElement, InvoiceProps>(
                 width: "18mm",
                 height: "18mm",
                 border: "0.5mm solid #000",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
+                overflow: "hidden",
                 background: "#fff",
                 flexShrink: 0,
               }}
             >
-              <span style={{ fontSize: "15pt", fontWeight: 900, color: BLUE, lineHeight: 1 }}>M</span>
-              <span style={{ fontSize: "3.5pt", fontWeight: 700, color: BLUE, letterSpacing: "0.5px" }}>MARSHALL</span>
+              <img src="/logo.jpg" alt="Marshall Ethel Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
             <div style={{ flex: 1, textAlign: "center" }}>
               <div style={{ fontSize: "20pt", fontWeight: 900, color: BLUE, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>
@@ -313,7 +317,7 @@ const Invoice = forwardRef<HTMLDivElement, InvoiceProps>(
           </div>
 
           {/* ---- product table (header + 9 rows, AMOUNT has N/K sub-header) ---- */}
-          <div style={{ marginTop: "3mm" }}>
+          <div style={{ marginTop: "2mm" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
               <colgroup>
                 <col style={{ width: "8%" }} />
@@ -326,27 +330,27 @@ const Invoice = forwardRef<HTMLDivElement, InvoiceProps>(
               <thead>
                 <tr>
                   <th rowSpan={2} style={{ ...headerStyle }}>QTY</th>
-                  <th rowSpan={2} style={{ ...headerStyle }}>DESCRIPTION</th>
+                  <th rowSpan={2} style={{ ...headerStyle, background: STRIPE }}>DESCRIPTION</th>
                   <th rowSpan={2} style={{ ...headerStyle }}>MN</th>
-                  <th rowSpan={2} style={{ ...headerStyle }}>SN</th>
+                  <th rowSpan={2} style={{ ...headerStyle, background: STRIPE }}>SN</th>
                   <th rowSpan={2} style={{ ...headerStyle }}>RATE</th>
                   <th style={{ ...headerStyle }}>AMOUNT</th>
                 </tr>
                 <tr>
-                  <th style={{ ...headerStyle, padding: "0.8mm 1.5mm" }}>
+                  <th style={{ ...headerStyle, padding: "0.8mm 1.5mm", background: STRIPE }}>
                     <span>N</span>&nbsp;&nbsp;<span>K</span>
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {displayRows.map((r: any, i: number) => (
-                  <tr key={i} style={{ height: "7.2mm" }}>
+                  <tr key={i} style={{ height: ROW_H }}>
                     <td style={{ ...cellStyle, textAlign: "center" }}>{r ? r.qty : ""}</td>
-                    <td style={{ ...cellStyle, textAlign: "left" }}>{r ? r.description : ""}</td>
+                    <td style={{ ...cellStyle, textAlign: "left", background: STRIPE }}>{r ? r.description : ""}</td>
                     <td style={{ ...cellStyle, textAlign: "center" }}>{r ? r.mn : ""}</td>
-                    <td style={{ ...cellStyle, textAlign: "center" }}>{r ? r.sn : ""}</td>
+                    <td style={{ ...cellStyle, textAlign: "center", background: STRIPE }}>{r ? r.sn : ""}</td>
                     <td style={{ ...cellStyle, textAlign: "right" }}>{r ? fmt(r.rate) : ""}</td>
-                    <td style={{ ...cellStyle, textAlign: "right" }}>{r ? fmt(r.amount) : ""}</td>
+                    <td style={{ ...cellStyle, textAlign: "right", background: STRIPE }}>{r ? fmt(r.amount) : ""}</td>
                   </tr>
                 ))}
               </tbody>
@@ -354,7 +358,7 @@ const Invoice = forwardRef<HTMLDivElement, InvoiceProps>(
           </div>
 
           {/* ---- terms (left) + payment boxes (right) on the same row ---- */}
-          <div style={{ display: "flex", marginTop: "2.5mm", gap: "4mm", alignItems: "stretch" }}>
+          <div style={{ display: "flex", marginTop: "2mm", gap: "4mm", alignItems: "stretch" }}>
             <div style={{ flex: 1, fontSize: "7.6pt", paddingTop: "1mm" }}>
               Goods tested and certified to be in good condition cannot be returned or replaced with effect from the
               day of purchase.
@@ -389,33 +393,34 @@ const Invoice = forwardRef<HTMLDivElement, InvoiceProps>(
           </div>
 
           {/* ---- comment box (left only) ---- */}
-          <div style={{ border: "0.35mm solid " + LINE, marginTop: "2.5mm", padding: "1.5mm 2mm", fontSize: "7.6pt", width: "70%" }}>
+          <div style={{ border: "0.35mm solid " + LINE, marginTop: "2mm", padding: "1.5mm 2mm", fontSize: "7.6pt", width: "70%" }}>
             <div><b>Comment:</b></div>
             <div style={{ marginTop: "0.5mm" }}><b>NOTE:</b> No warranty on TV Screen. (No warranty on Generators)</div>
             <div>Warranty is strictly on REPAIRS by the company not replacement or changing.</div>
           </div>
 
           {/* ---- value in words ---- */}
-          <div style={{ display: "flex", alignItems: "baseline", marginTop: "3mm", fontSize: "8.2pt", gap: "2mm" }}>
+          <div style={{ display: "flex", alignItems: "baseline", marginTop: "2mm", fontSize: "8.2pt", gap: "2mm" }}>
             <span style={{ fontWeight: 700 }}>Value in words:</span>
             <span style={{ borderBottom: "0.35mm solid " + LINE, flex: 1, padding: "0 1mm" }}>{words}</span>
             <span style={{ fontWeight: 700 }}>Kobo</span>
           </div>
 
           {/* ---- signatures ---- */}
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "9mm", alignItems: "flex-start" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "5mm", alignItems: "flex-start" }}>
             <div style={{ width: "78mm", textAlign: "center" }}>
-              <div style={{ borderTop: "0.35mm solid " + LINE, marginBottom: "1.2mm", height: "9mm" }} />
+              <div style={{ borderTop: "0.35mm solid " + LINE, marginBottom: "1.2mm", height: "7mm" }} />
               <div style={{ fontSize: "8pt", fontWeight: 700 }}>Customer's Sign</div>
             </div>
             <div style={{ width: "78mm", textAlign: "center" }}>
-              <div style={{ borderTop: "0.35mm solid " + LINE, marginBottom: "1.2mm", height: "9mm" }} />
-              <div style={{ fontSize: "8pt", fontWeight: 700 }}>For: MARSHALL ETHEL NIG. LTD.</div>
+              <div style={{ borderTop: "0.35mm solid " + LINE, marginBottom: "1.2mm", height: "7mm" }} />
+              <div style={{ fontSize: "8pt", fontWeight: 700 }}>Manager's Sign</div>
+              <div style={{ fontSize: "7pt" }}>For: MARSHALL ETHEL NIG. LTD.</div>
             </div>
           </div>
 
           {/* ---- thanks + perforation ---- */}
-          <div style={{ marginTop: "auto", paddingTop: "4mm" }}>
+          <div style={{ marginTop: "auto", paddingTop: "3mm" }}>
             <div style={{ textAlign: "center", fontSize: "7.6pt", fontStyle: "italic", marginBottom: "1.5mm" }}>
               Thanks for your patronage
             </div>
@@ -427,7 +432,7 @@ const Invoice = forwardRef<HTMLDivElement, InvoiceProps>(
 
         {/* ============================ BUSINESS COPY ============================ */}
         {showBusinessCopy && (
-          <div style={{ marginTop: "3mm", borderTop: "0.2mm dashed #333", paddingTop: "3mm" }}>
+          <div style={{ marginTop: "2.5mm", borderTop: "0.2mm dashed #333", paddingTop: "2.5mm" }}>
             <div style={{ fontSize: "11.5pt", fontWeight: 900, color: BLUE, textAlign: "center" }}>
               MARSHALL ETHEL NIG. LTD. - BUSINESS COPY
             </div>
@@ -446,7 +451,7 @@ const Invoice = forwardRef<HTMLDivElement, InvoiceProps>(
             </div>
 
             {/* duplicate table - same 6 columns, data row only (no empty rows) */}
-            <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginTop: "2mm" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", marginTop: "1.5mm" }}>
               <colgroup>
                 <col style={{ width: "8%" }} />
                 <col style={{ width: "36%" }} />
@@ -458,33 +463,33 @@ const Invoice = forwardRef<HTMLDivElement, InvoiceProps>(
               <thead>
                 <tr>
                   <th rowSpan={2} style={{ ...headerStyle }}>QTY</th>
-                  <th rowSpan={2} style={{ ...headerStyle }}>DESCRIPTION</th>
+                  <th rowSpan={2} style={{ ...headerStyle, background: STRIPE }}>DESCRIPTION</th>
                   <th rowSpan={2} style={{ ...headerStyle }}>MN</th>
-                  <th rowSpan={2} style={{ ...headerStyle }}>SN</th>
+                  <th rowSpan={2} style={{ ...headerStyle, background: STRIPE }}>SN</th>
                   <th rowSpan={2} style={{ ...headerStyle }}>RATE</th>
                   <th style={{ ...headerStyle }}>AMOUNT</th>
                 </tr>
                 <tr>
-                  <th style={{ ...headerStyle, padding: "0.8mm 1.5mm" }}>
+                  <th style={{ ...headerStyle, padding: "0.8mm 1.5mm", background: STRIPE }}>
                     <span>N</span>&nbsp;&nbsp;<span>K</span>
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((r, i) => (
-                  <tr key={i}>
+                  <tr key={i} style={{ height: ROW_H }}>
                     <td style={{ ...cellStyle, textAlign: "center" }}>{r.qty}</td>
-                    <td style={{ ...cellStyle, textAlign: "left" }}>{r.description}</td>
+                    <td style={{ ...cellStyle, textAlign: "left", background: STRIPE }}>{r.description}</td>
                     <td style={{ ...cellStyle, textAlign: "center" }}>{r.mn}</td>
-                    <td style={{ ...cellStyle, textAlign: "center" }}>{r.sn}</td>
+                    <td style={{ ...cellStyle, textAlign: "center", background: STRIPE }}>{r.sn}</td>
                     <td style={{ ...cellStyle, textAlign: "right" }}>{fmt(r.rate)}</td>
-                    <td style={{ ...cellStyle, textAlign: "right" }}>{fmt(r.amount)}</td>
+                    <td style={{ ...cellStyle, textAlign: "right", background: STRIPE }}>{fmt(r.amount)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
 
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "5mm" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "3mm" }}>
               <div style={{ width: "62mm", textAlign: "center" }}>
                 <div style={{ borderTop: "0.35mm solid " + LINE, height: "8mm", marginBottom: "1mm" }} />
                 <div style={{ fontSize: "8pt", fontWeight: 700 }}>Manager's Sign</div>

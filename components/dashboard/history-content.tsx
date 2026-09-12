@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Skeleton } from "@/components/ui/skeleton"
 import { createClient } from "@/lib/supabase/client"
 import Invoice from "./invoice"
+import { getReceiptNumber } from "@/lib/receipt-number"
 import { Printer, Loader2, LayoutGrid, ShoppingCart, Package, ShieldCheck } from "lucide-react"
 import { snackbar } from "@/lib/ui/snackbar"
 
@@ -31,6 +32,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
 
   const [reprintOpen, setReprintOpen] = useState(false)
   const [reprintTransaction, setReprintTransaction] = useState<any | null>(null)
+  const [reprintNo, setReprintNo] = useState("")
   const [receiptItems, setReceiptItems] = useState<any[]>([])
   const [customerName, setCustomerName] = useState("")
   const [customerAddress, setCustomerAddress] = useState("")
@@ -169,6 +171,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
       }))
 
       setReprintTransaction(txRecord || { id: txId, total_amount: Number(log?.details?.total_amount || 0), payment_method: String(log?.details?.payment_method || "cash"), transaction_date: log?.created_at })
+      setReprintNo(await getReceiptNumber(supabase, txId))
       setReceiptItems(withNames)
       setCustomerName(String(log?.details?.customer_name || ""))
       setCustomerAddress(String(log?.details?.customer_address || ""))
@@ -497,7 +500,7 @@ export default function HistoryContent({ admin, logs: initialLogs, user }: any) 
               <div className="space-y-3">
                 <Invoice
                   ref={receiptRef}
-                  invoiceNo={String(reprintTransaction.id).slice(0, 6).toUpperCase()}
+                  invoiceNo={reprintNo || String(reprintTransaction.id).slice(0, 6).toUpperCase()}
                   date={reprintTransaction.transaction_date || reprintTransaction.created_at}
                   customer={{ name: customerName, address: customerAddress, phone: customerPhone }}
                   items={receiptItems.map((it: any) => ({

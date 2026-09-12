@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Plus, Trash2, Printer, CheckCircle } from "lucide-react"
 import Invoice from "./invoice"
+import { getReceiptNumber } from "@/lib/receipt-number"
 import { snackbar } from "@/lib/ui/snackbar"
 
 interface CartItem {
@@ -33,6 +34,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
   const [isLoading, setIsLoading] = useState(false)
   const [showReceipt, setShowReceipt] = useState(false)
   const [lastTransaction, setLastTransaction] = useState<any>(null)
+  const [receiptNo, setReceiptNo] = useState("")
   const [receiptItems, setReceiptItems] = useState<CartItem[]>([])
   const [customerName, setCustomerName] = useState("")
   const [customerAddress, setCustomerAddress] = useState("")
@@ -259,6 +261,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
         .maybeSingle()
 
       setLastTransaction(txRecord || { id: data.transaction_id, total_amount: totalAmount, payment_method: paymentMethod, transaction_date: new Date().toISOString() })
+      setReceiptNo(await getReceiptNumber(supabase, data.transaction_id))
       const enriched = cart.map((it) => {
         const p = products.find((pr: any) => String(pr.id) === String(it.product_id))
         return {
@@ -310,7 +313,7 @@ export default function CheckoutContent({ admin, products, user, shops = [] }: a
 
           <Invoice
             ref={receiptRef}
-            invoiceNo={String(lastTransaction.id).slice(0, 6).toUpperCase()}
+            invoiceNo={receiptNo || String(lastTransaction.id).slice(0, 6).toUpperCase()}
             date={lastTransaction.transaction_date || lastTransaction.created_at}
             customer={{ name: customerName, address: customerAddress, phone: customerPhone }}
             items={receiptItems.map((it) => ({
