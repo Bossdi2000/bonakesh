@@ -18,6 +18,7 @@ const formatCurrency = (n: number) => `₦${n.toLocaleString("en-NG")}`
 export default function ShopDetails({ admin, user, shop, products, shops = [] }: any) {
   const router = useRouter()
   const [hidden, setHidden] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
 
   const [transferOpen, setTransferOpen] = useState(false)
   const [transferProduct, setTransferProduct] = useState<any | null>(null)
@@ -29,6 +30,16 @@ export default function ShopDetails({ admin, user, shop, products, shops = [] }:
   const totalProducts = products.length
   const totalUnits = products.reduce((acc: number, p: any) => acc + Number(p.quantity || 0), 0)
   const totalValue = products.reduce((acc: number, p: any) => acc + Number(p.selling_price || 0) * Number(p.quantity || 0), 0)
+
+  const filteredProducts = products.filter((p: any) => {
+    const q = searchTerm.trim().toLowerCase()
+    if (!q) return true
+    return (
+      String(p.name || "").toLowerCase().includes(q) ||
+      String(p.model_number || "").toLowerCase().includes(q) ||
+      String(p.serial_number || "").toLowerCase().includes(q)
+    )
+  })
 
   const openTransfer = (product: any) => {
     setTransferProduct(product)
@@ -132,8 +143,14 @@ export default function ShopDetails({ admin, user, shop, products, shops = [] }:
           <CardHeader>
             <CardTitle className="text-neutral-900 dark:text-white">Items in {shop.name}</CardTitle>
           </CardHeader>
-          <CardContent>
-            {products.length > 0 ? (
+          <CardContent className="space-y-4">
+            <Input
+              placeholder="Search items by name, model or serial number..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-white border-[#0ea5e9]/30 text-neutral-900 dark:bg-[#0a1620] dark:text-white"
+            />
+            {filteredProducts.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -148,7 +165,7 @@ export default function ShopDetails({ admin, user, shop, products, shops = [] }:
                     </tr>
                   </thead>
                   <tbody>
-                    {products.map((product: any) => (
+                    {filteredProducts.map((product: any) => (
                       <tr
                         key={product.id}
                         className="border-b border-[#0ea5e9]/30 hover:bg-[#0ea5e9]/5 dark:hover:bg-white/5 transition-colors"
@@ -185,7 +202,9 @@ export default function ShopDetails({ admin, user, shop, products, shops = [] }:
                 </table>
               </div>
             ) : (
-              <div className="py-8 text-center text-neutral-600 dark:text-white/70">No items in this shop yet</div>
+              <div className="py-8 text-center text-neutral-600 dark:text-white/70">
+                {products.length === 0 ? "No items in this shop yet" : `No items match "${searchTerm}"`}
+              </div>
             )}
           </CardContent>
         </Card>
